@@ -103,7 +103,8 @@ int validaCPF(char cpf[12]) {
     int modSum2 = soma % 11;
     segundoDigitoV = (modSum2 < 2) ? 0 : 11 - modSum2;
 
-    return (primeiroDigitoV == (cpf[9] - '0') && segundoDigitoV == (cpf[10] - '0'));
+    return (primeiroDigitoV == (cpf[9] - '0') &&
+            segundoDigitoV == (cpf[10] - '0'));
 }
 
 int validaCNPJ(char cnpj[15]) {
@@ -129,7 +130,23 @@ int validaCNPJ(char cnpj[15]) {
     return (digito1 == (cnpj[12] - '0') && digito2 == (cnpj[13] - '0'));
 }
 
-void cadastrarClientes() {
+int codigoJaExiste(FILE* fp, int code) {
+    rewind(fp);
+
+    int identificador;
+    char nome[maxNome];
+    int telefone;
+    char email[maxEmail];
+
+    while (fscanf(fp, "%d,%29[^,],%d,%49[^\n]", &identificador, nome, &telefone, email) == 4) {
+        if (identificador == code) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+void cadastrarClientes(FILE* fp) {
     clear();
     int tCadastro;
     printw("===== TIPO DE CADASTRO =====\n\n");
@@ -141,17 +158,55 @@ void cadastrarClientes() {
 
     switch (tCadastro) {
         case 1: {
+            int code;
+
             clear();
-            char cpf[12];
-            printw("Digite o CPF (somente números): ");
-            echo();
-            scanw("%11s", cpf);
-            noecho();
-            int ehValido = validaCPF(cpf);
-            if (ehValido) printw("\nCPF válido!\n");
-            else printw("\nCPF inválido!\n");
+            printw("===== Cadastro de Cliente =====\n\n");
+
+            printw("Digite o código identificador: ");
+            scanw("%d", &code);
             refresh();
-            getch();
+
+            if (codigoJaExiste(fp, code)) {
+                clear();
+                printw("ERRO: Código de cliente já cadastrado!\n");
+                refresh();
+                getch();
+            } else {
+                clear();
+                char cpf[12];
+                printw("Digite o CPF (somente números): ");
+                echo();
+                getstr(cpf);
+                noecho();
+
+                if (validaCPF(cpf)) {
+                    printw("\nCPF válido!\n");
+                    refresh();
+                    
+                    Cliente cliente;
+                    cliente.identificador = code;
+
+                    clear();
+                    printw("===== CADASTRO (Código: %d) =====\n\n", cliente.identificador);
+                    printw("Digite o seu nome: ");
+                    echo();
+                    getstr(cliente.nome);
+                    printw("Digite o número de telefone (sem DDD): ");
+                    scanw("%d", &cliente.telefone);
+                    printw("Digite o seu email: ");
+                    getstr(cliente.email);
+                    
+                    fprintf(fp, "%d,%s,%d,%s\n", cliente.identificador, cliente.nome, cliente.telefone, cliente.email);
+                    fflush(fp);
+
+                    printw("\nCliente cadastrado com sucesso!\n");
+                } else {
+                    printw("\nCPF inválido!\n");
+                }
+                refresh();
+                getch();
+            }
             break;
         }
         case 2: {
@@ -159,11 +214,12 @@ void cadastrarClientes() {
             char cnpj[15];
             printw("Digite o CNPJ (somente números): ");
             echo();
-            scanw("%14s", cnpj);
+            getstr(cnpj);
             noecho();
-            int ehValido = validaCNPJ(cnpj);
-            if (ehValido) printw("\nCNPJ válido!\n");
-            else printw("\nCNPJ inválido!\n");
+            if (validaCNPJ(cnpj))
+                printw("\nCNPJ válido!\n");
+            else
+                printw("\nCNPJ inválido!\n");
             refresh();
             getch();
             break;
@@ -180,6 +236,11 @@ int main() {
     FILE* fpClientes = fopen("clientes.csv", "a+");
     FILE* fpProdutos = fopen("produtos.csv", "a+");
     FILE* fpPedidos = fopen("pedidos.csv", "a+");
+    
+    if(fpClientes == NULL || fpProdutos == NULL || fpPedidos == NULL) {
+        printf("Erro ao abrir os arquivos necessários.\n");
+        return EXIT_FAILURE;
+    }
 
     int inicioValor = menuInicial();
     clear();
@@ -188,17 +249,33 @@ int main() {
         case 1: {
             int manterValor = manterClientes();
             switch (manterValor) {
-                case 1: cadastrarClientes(); break;
-                case 2: printw("Consultar Clientes"); break;
-                case 3: printw("Remover Clientes"); break;
-                case 4: printw("Listar Clientes!"); break;
-                default: printw("Opção Inválida!"); break;
+                case 1:
+                    cadastrarClientes(fpClientes);
+                    break;
+                case 2:
+                    printw("Consultar Clientes");
+                    break;
+                case 3:
+                    printw("Remover Clientes");
+                    break;
+                case 4:
+                    printw("Listar Clientes!");
+                    break;
+                default:
+                    printw("Opção Inválida!");
+                    break;
             }
             break;
         }
-        case 2: printw("Você escolheu: Manter Produtos\n"); break;
-        case 3: printw("Você escolheu: Manter Pedidos\n"); break;
-        default: printw("Opção inválida.\n"); break;
+        case 2:
+            printw("Você escolheu: Manter Produtos\n");
+            break;
+        case 3:
+            printw("Você escolheu: Manter Pedidos\n");
+            break;
+        default:
+            printw("Opção inválida.\n");
+            break;
     }
 
     printw("\nPressione qualquer tecla para sair...");
