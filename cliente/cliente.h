@@ -36,7 +36,7 @@ typedef struct {
 
 int validaCPF(char cpf[tamCPF]);
 int validaCNPJ(char cnpj[tamCNPJ]);
-int codigoJaExiste(FILE* fp, int code);
+int codigoClienteJaExiste(FILE* fp, int code);
 void cadastrarClientes(FILE* fp);
 void consultarClientes(FILE* fp);
 FILE* deletarClientes(FILE* fp);

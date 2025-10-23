@@ -49,7 +49,7 @@ int validaCNPJ(char cnpj[tamCNPJ]) {
     return (digito1 == (cnpj[12] - '0') && digito2 == (cnpj[13] - '0'));
 }
 
-int codigoJaExiste(FILE* fp, int code) {
+int codigoClienteJaExiste(FILE* fp, int code) {
     rewind(fp);
 
     int identificador;
@@ -97,7 +97,7 @@ void cadastrarClientes(FILE* fp) {
                 getch();
                 refresh();
 
-                int verdadeiro = codigoJaExiste(fp, code);
+                int verdadeiro = codigoClienteJaExiste(fp, code);
 
                 if (verdadeiro) {
                     clear();
@@ -207,7 +207,7 @@ void cadastrarClientes(FILE* fp) {
                 getch();
                 refresh();
                 
-                int code_existe = codigoJaExiste(fp, cliente.identificador);
+                int code_existe = codigoClienteJaExiste(fp, cliente.identificador);
                 
                 if (code_existe) {
                     clear();
