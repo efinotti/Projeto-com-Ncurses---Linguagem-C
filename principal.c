@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "cliente/cliente.h"
 
 #define maxNome 30
@@ -78,6 +79,29 @@ int manterClientes() {
     refresh();
     return x;
 }
+int manterProdutos() {
+    int x;
+    clear();
+    printw("===== MANTER PRODUTOS =====\n\n");
+    printw("1) Cadastro de Produtos\n");
+    printw("2) Consultar Produtos\n");
+    printw("3) Remover Produtos\n");
+    printw("4) Listar Produtos\n");
+    printw("5) Voltar\n\n");
+    printw("Digite a opção escolhida: ");
+    scanw("%d", &x);
+    getch();
+    refresh();
+    return x;
+}
+
+void cadastrarProdutos(FILE* fp) {}
+
+void consultarProdutos(FILE* fp) {}
+
+void deletarProdutos(FILE* fp) {}
+
+void listarProdutos(FILE* fp) {}
 
 int main() {
     FILE* fpClientes = fopen("clientes.csv", "a+");
@@ -127,7 +151,31 @@ int main() {
                 break;
             }
             case 2:
-                printw("Você escolheu: Manter Produtos (Não implementado)\n");
+                int produtoValor;
+                do {
+                    produtoValor = manterProdutos();
+                    switch (produtoValor) {
+                        case 1:
+                        cadastrarProdutos(fpProdutos);
+                            break;
+                        case 2:
+                        cadastrarProdutos(fpProdutos);
+                            break;
+                        case 3:
+                        deletarProdutos(fpProdutos);
+                            break;
+                        case 4:
+                        listarProdutos(fpProdutos);
+                            break;
+                        case 5:
+                            break;
+                        default:
+                        printw("Código inválido! Tente novamente um código válido.");
+                            break;
+                    }
+
+                } while (produtoValor != 5);
+
                 refresh();
                 getch();
                 break;
