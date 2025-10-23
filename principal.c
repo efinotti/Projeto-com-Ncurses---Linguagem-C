@@ -182,7 +182,7 @@ void cadastrarClientes(FILE* fp) {
 
     switch (tCadastro) {
         case 1: {
-            int validade;
+            int validade = 0; /* CORRIGIDO: Inicializa a variável de controle */
             do {
                 int code;
                 clear();
@@ -205,7 +205,8 @@ void cadastrarClientes(FILE* fp) {
                     char cpf[tamCPF];
 
                     clear();
-                    printf("===== CADASTRO DE CPF =====\n\n");
+                    /* CORRIGIDO: Troca printf por printw */
+                    printw("===== CADASTRO DE CPF =====\n\n");
                     printw("Digite o CPF (somente 11 números): ");
                     echo();
                     getnstr(cpf, 11);
@@ -279,6 +280,8 @@ void cadastrarClientes(FILE* fp) {
                         fflush(fp);
 
                         printw("\nCliente cadastrado com sucesso!\n");
+                        /* CORRIGIDO: Atualiza a variável para sair do loop */
+                        validade = 1;
                     } else {
                         printw("\nCPF inválido! Digite novamente!\n");
                         getch();
@@ -292,7 +295,11 @@ void cadastrarClientes(FILE* fp) {
         case 2: {
             Cliente cliente;
 
-            int validado;
+            /* * CORRIGIDO: 
+             * 'validado_loop' controla o loop (para sair após sucesso).
+             * 'code_existe' verifica se o código já existe.
+             */
+            int validado_loop = 0; 
 
             do {
                 clear();
@@ -302,8 +309,10 @@ void cadastrarClientes(FILE* fp) {
                 scanw("%d", &cliente.identificador);
                 getch();
                 refresh();
-                validado = codigoJaExiste(fp, cliente.identificador);
-                if (validado) {
+                
+                int code_existe = codigoJaExiste(fp, cliente.identificador);
+                
+                if (code_existe) {
                     clear();
                     printw("ERRO: Código de cliente já cadastrado!");
                     getch();
@@ -396,6 +405,8 @@ void cadastrarClientes(FILE* fp) {
                         fflush(fp);
 
                         printw("\nCliente cadastrado com sucesso!\n");
+                        /* CORRIGIDO: Atualiza a variável para sair do loop */
+                        validado_loop = 1; 
                     } else {
                         printw("\nCNPJ inválido! Refaça novamente!\n");
                         getch();
@@ -404,7 +415,7 @@ void cadastrarClientes(FILE* fp) {
                     refresh();
                     getch();
                 }
-            } while (validado != 1);
+            } while (validado_loop != 1);
             break;
         }
         case 3:
@@ -435,6 +446,7 @@ void consultarClientes(FILE* fp) {
 
     printw("Digite o código verificador: ");
     scanw("%d", &code);
+    getch(); /* CORRIGIDO: Movido getch para depois do scanw */
     refresh();
 
     while (fscanf(fp,
@@ -444,7 +456,7 @@ void consultarClientes(FILE* fp) {
                   estado, cpf, razaoSocial, cnpj) == 11) {
         if (identificador == code) {
             contador++;
-            printw("%d,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s", identificador, nome,
+            printw("%d,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s\n", identificador, nome,
                    telefone, email, rua, setor, cidade, estado, cpf,
                    razaoSocial, cnpj);
         }
@@ -453,6 +465,11 @@ void consultarClientes(FILE* fp) {
     if (contador == 0) {
         printw("Não foi encontrado nenhum item com este identificador!");
     }
+
+    /* CORRIGIDO: Adiciona pausa para o usuário ler a saída */
+    printw("\n\nPressione qualquer tecla para continuar...");
+    refresh();
+    getch();
 }
 
 FILE* deletarClientes(FILE* fp) {
@@ -537,20 +554,34 @@ void listarClientes(FILE* fp) {
     char rua[maxEndereco], setor[maxEndereco], cidade[maxEndereco],
         estado[maxEndereco];
     char cpf[tamCPF], razaoSocial[maxRazao], cnpj[tamCNPJ];
-    int code;
-    int contador;
+    
+    /* CORRIGIDO: Inicializa o contador */
+    int contador = 0;
 
     rewind(fp);
+
+    printw("===== LISTA DE TODOS OS CLIENTES =====\n\n");
 
     while (fscanf(fp,
                   "%d,%29[^,],%d,%49[^,],%39[^,],%39[^,],%39[^,],%39[^,],%11[^,"
                   "],%39[^,],%14[^\n]\n",
                   &identificador, nome, &telefone, email, rua, setor, cidade,
                   estado, cpf, razaoSocial, cnpj) == 11) {
-        printw("%d,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s", identificador, nome,
+        printw("%d,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s\n", identificador, nome,
                telefone, email, rua, setor, cidade, estado, cpf, razaoSocial,
                cnpj);
+        contador++; /* CORRIGIDO: Incrementa o contador */
     }
+
+    /* CORRIGIDO: Adiciona mensagem se não houver clientes */
+    if (contador == 0) {
+        printw("Nenhum cliente cadastrado.\n");
+    }
+
+    /* CORRIGIDO: Adiciona pausa para o usuário ler a saída */
+    printw("\n\nPressione qualquer tecla para continuar...");
+    refresh();
+    getch();
 }
 
 int main() {
@@ -558,7 +589,6 @@ int main() {
     FILE* fpProdutos = fopen("produtos.csv", "a+");
     FILE* fpPedidos = fopen("pedidos.csv", "a+");
 
-    // Se não conseguir abrir qualquer dos arquivos, ele irá finalizar
     if (fpClientes == NULL || fpProdutos == NULL || fpPedidos == NULL) {
         endwin();
         printf(
@@ -572,7 +602,6 @@ int main() {
     do {
         inicioValor = menuInicial();
         clear();
-        // Menu Inicial
         switch (inicioValor) {
             case 1: {
                 int clienteValor;
@@ -592,10 +621,13 @@ int main() {
                             listarClientes(fpClientes);
                             break;
                         case 5:
-                            getchar();
+                            /* CORRIGIDO: Remove getchar() desnecessário */
                             break;
                         default:
                             printw("Opção Inválida!");
+                            /* CORRIGIDO: Adiciona pausa */
+                            refresh();
+                            getch();
                             break;
                     }
                 } while (clienteValor != 5);
@@ -603,20 +635,29 @@ int main() {
             }
             case 2:
                 printw("Você escolheu: Manter Produtos (Não implementado)\n");
+                /* CORRIGIDO: Adiciona pausa */
+                refresh();
+                getch();
                 break;
             case 3:
                 printw("Você escolheu: Manter Pedidos (Não implementado)\n");
+                /* CORRIGIDO: Adiciona pausa */
+                refresh();
+                getch();
                 break;
 
             case 4:
                 clear();
-                printw("Digite qualquer valor para sair!");
+                /* CORRIGIDO: Mensagem de saída mais clara */
+                printw("Saindo do programa...\n");
                 refresh();
-                getchar();
-
+                /* CORRIGIDO: Remove getchar() desnecessário */
                 break;
             default:
                 printw("Opção inválida.\n");
+                /* CORRIGIDO: Adiciona pausa */
+                refresh();
+                getch();
                 break;
         }
     } while (inicioValor != 4);
