@@ -15,6 +15,8 @@
 typedef struct {
     int codigoPedido;
     int codigoCliente;
+    int codigoProduto;
+    int quantidade;
     char data[maxData];
     char descricao[maxDescricao];
     float valorTotal;
