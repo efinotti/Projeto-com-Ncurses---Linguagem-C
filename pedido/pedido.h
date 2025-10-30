@@ -24,6 +24,7 @@ typedef struct {
 }Pedido;
 
 int codigoPedidoJaExiste(FILE * fp, int code);
+int codigoClienteJaExiste(FILE * fp, int code);
 void cadastrarPedido(FILE *fp);
 void listarPedidos(FILE *fp);
 void consultarPedido(FILE *fp, int code);
