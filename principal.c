@@ -4,13 +4,7 @@
 #include <string.h>
 
 #include "cliente/cliente.h"
-
-typedef struct {
-    int identificador;
-    char descricao[maxDescricao];
-    double preco;
-    int estoque;
-} Produtos;
+#include "Produtos.h"
 
 typedef struct {
     int identificadorProduto;
@@ -86,140 +80,13 @@ int manterProdutos() {
     return x;
 }
 
-int codigoProdutoJaExiste(FILE* fp, int code) {
-    int codigo, estoque;
-    char descricao[maxDescricao];
-    double preco;
-
-    int valido = 0;
-
-    rewind(fp);
-
-    while (fscanf(fp, "%d,%99[^,],%lf,%d", &codigo, descricao, &preco,
-                  &estoque) == 4) {
-        if (codigo == code) {
-            return 1;
-        }
-    }
-
-    return 0;
-}
-
-void cadastrarProdutos(FILE* fp) {
-    Produtos produto;
-
-    int codigo_existe;
-
-    do {
-        clear();
-        printw("===== CADASTRO DE PRODUTO =====\n\n");
-
-        printw("Digite um código identificador para o produto: ");
-        scanw("%d", &produto.identificador);
-        getch();
-
-        codigo_existe = codigoProdutoJaExiste(fp, produto.identificador);
-
-        if (codigo_existe == 1) {
-            clear();
-            printw("ERRO: O código %d já está cadastrado!\n",
-                   produto.identificador);
-            printw("Por favor, digite um código diferente.\n");
-            refresh();
-            getch();
-        }
-
-    } while (codigo_existe == 1);
-
-    clear();
-
-    printw("===== CADASTRO DE PRODUTO (Cód: %d) =====\n\n",
-           produto.identificador);
-
-    printw("Digite a descrição do produto: ");
-    echo();
-    getnstr(produto.descricao, maxDescricao - 1);
-    noecho();
-
-    printw("Digite o preço do produto: ");
-    scanw("%lf", &produto.preco);
-    getch();
-
-    printw("Digite quantos itens tem no estoque: ");
-    scanw("%d", &produto.estoque);
-    getch();
-
-    fprintf(fp, "%d,%s,%.2lf,%d\n", produto.identificador, produto.descricao,
-            produto.preco, produto.estoque);
-    fflush(fp);
-
-    printw("\nProduto cadastrado com sucesso!");
-    refresh();
-    getch();
-}
-
-void consultarProdutos(FILE* fp) {
-    Produtos produto;
-    int codigo;
-    int encontrado = 0;
-
-    clear();
-    printw("===== CONSULTAR PRODUTOS =====\n\n");
-
-    printw("Digite o código para ser consultado: ");
-    scanw("%d", &codigo);
-
-    refresh();
-
-    clear();
-
-    printw("===== CONSULTAR PRODUTOS =====\n\n");
-
-    rewind(fp);
-
-    while (fscanf(fp, "%d,%99[^,],%lf,%d", &produto.identificador,
-                  produto.descricao, &produto.preco, &produto.estoque) == 4) {
-        if (codigo == produto.identificador) {
-            printw("%d,%s,%lf,%d", produto.identificador, produto.descricao,
-                   produto.preco, produto.estoque);
-            encontrado++;
-        }
-    }
-
-    if (encontrado == 0) {
-        printw(
-            "Não existe qualquer produto com este identificador!\nTente com um "
-            "valor válido!");
-    }
-
-    refresh();
-    getch();
-}
-
-FILE* deletarProdutos(FILE* fp) {
-    clear();
-    printw("Função 'Deletar Produtos' não implementada.\n");
-    refresh();
-    getch();
-    return fp;
-}
-
-void listarProdutos(FILE* fp) {
-    clear();
-    printw("Função 'Listar Produtos' não implementada.\n");
-    refresh();
-    getch();
-}
-
 int main() {
     FILE* fpClientes = fopen("clientes.csv", "a+");
     FILE* fpProdutos = fopen("produtos.csv", "a+");
     FILE* fpPedidos = fopen("pedidos.csv", "a+");
 
     if (fpClientes == NULL || fpProdutos == NULL || fpPedidos == NULL) {
-        printf(
-            "Erro fatal: Não foi possível abrir os arquivos .csv "
-            "necessários.\n");
+        printf("Erro fatal: Não foi possível abrir os arquivos .csv necessários.\n");
         return EXIT_FAILURE;
     }
 
@@ -269,7 +136,12 @@ int main() {
                             consultarProdutos(fpProdutos);
                             break;
                         case 3:
-                            fpProdutos = deletarProdutos(fpProdutos);
+                            deletarProdutos(fpProdutos);
+                            fpProdutos = fopen(ARQUIVO_PRODUTOS, "a+"); 
+                            if (fpProdutos == NULL) {
+                                printf("ERRO CRÍTICO: Não foi possível reabrir o arquivo após a deleção.\n"); 
+                                exit(1); 
+                            }
                             break;
                         case 4:
                             listarProdutos(fpProdutos);
@@ -278,8 +150,7 @@ int main() {
                             break;
                         default:
                             printw(
-                                "Código inválido! Tente novamente um código "
-                                "válido.");
+                                "Código inválido! Tente novamente um código válido.");
                             refresh();
                             getch();
                             break;
