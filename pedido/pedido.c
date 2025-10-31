@@ -5,11 +5,11 @@ void obterDataAtual(char *destino, int tamanho){
     struct tm *tm_info = localtime(&agora);
     
     snprintf(destino, tamanho, "%02d/%02d/%04d",
-            tm_info->tm_mday, tm_info->tm_mon + 1, tm_info->tm_year + 1900);
+        tm_info->tm_mday, tm_info->tm_mon + 1, tm_info->tm_year + 1900);
 }
 
 int codigoClienteJaExiste(FILE* fpC, int code){
-    rewind(fp);
+    rewind(fpC);
     
     int identificador;
     char nome[maxNome];
@@ -29,7 +29,7 @@ int codigoClienteJaExiste(FILE* fpC, int code){
 }
 
 int codigoProdutoJaExiste(FILE* fpP, int code){
-    rewind(fp);
+    rewind(fpP);
 
     int codigoProduto;
     char nome[maxNome];
@@ -46,7 +46,7 @@ int codigoProdutoJaExiste(FILE* fpP, int code){
 }
 
 int codigoPedidoJaExiste(FILE* fpPe, int code){
-    rewind(fp);
+    rewind(fpPe);
 
     int codigoPedido;
     int codigoCliente;
@@ -67,14 +67,14 @@ int codigoPedidoJaExiste(FILE* fpPe, int code){
     return 0;
 }
 
-void cadastrarPedido(FILE* fpPe){
+void cadastrarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
     clear();
 
     Pedido pedido;
 
     printw("\n\n=====CADASTRO DE PEDIDO=====\n\n");
 
-    printw("Digite o código do pedido:\n");
+    printw("Digite o código do pedido (não pode ser 0):\n");
     scanw("%d", &pedido.codigoPedido);
     getch();
 
@@ -98,7 +98,7 @@ void cadastrarPedido(FILE* fpPe){
     scanw("%d", &pedido.codigoProduto);
     getch();
     
-    if(!codigoProdutoExiste(fpP, pedido.codigoProduto)){
+    if(!codigoProdutoJaExiste(fpP, pedido.codigoProduto)){
         printw("\nErro: Produto não encontrado!\n");
         getch();
         return;
@@ -123,7 +123,7 @@ void cadastrarPedido(FILE* fpPe){
     
    strcpy(pedido.status, "Pendente");
     
-    fprintf(fpPe, "%d,%d,%d,%d,%s,%s,%s,%.2f\n", pedido.codigoPedido,pedido.codigoCliente,
+    fprintf(fpPe, "%d,%d,%d,%d,%s,%s,%.2f,%s\n", pedido.codigoPedido,pedido.codigoCliente,
             pedido.codigoProduto,pedido.quantidade,pedido.data,pedido.descricao,pedido.valorTotal,pedido.status);
         
     fflush(fpPe);
@@ -148,7 +148,7 @@ void listarPedidos(FILE *fpPe){
             printw("Código do Pedido: %d | Cliente: %d | Produto: %d | Descrição: %s | Quantidade: %d | Valor: %.2f | Data: %s | Status: %s\n",
                     pedido.codigoPedido,pedido.codigoCliente,pedido.codigoProduto,pedido.descricao,pedido.quantidade,pedido.valorTotal,
                     pedido.data,pedido.status);
-            }
+    }
             
     refresh();
     getch();
@@ -157,10 +157,10 @@ void listarPedidos(FILE *fpPe){
 void consultarPedido(FILE *fpPe, FILE *fpC){
     rewind(fpPe);
     
-    int codigoCliente, opc;
+    int codigoCliente, opc, encontro = 0;
     Pedido pedido;
     
-    printw("Informe o código do Cliente:\n");
+    printw("\nInforme o código do Cliente:\n");
     scanw("%d", &codigoCliente);
     getch();
     
@@ -177,11 +177,19 @@ void consultarPedido(FILE *fpPe, FILE *fpC){
                 &pedido.codigoPedido,&pedido.codigoCliente,&pedido.codigoProduto,&pedido.quantidade,
                 pedido.data,pedido.descricao,&pedido.valorTotal,pedido.status) == 8){
                 
-        if(pedido.codigoCliente == codigoCliente){
+        if(pedido.codigoCliente == codigoCliente && pedido.codigoPedido != 0){
             printw("\nCódigo do Pedido: %d | Descrição: %s | Quantidade: %d\n",
                     pedido.codigoPedido,pedido.descricao,pedido.quantidade);
+            encontro = 1;
         }
     }
+    
+    if(encontro == 0){
+        printw("\nErro: Nenhum Pedido Encontrado!\n");
+        getch();
+        return fpPe;
+    }
+    
     printw("\nQual pedido você deseja consultar?:\n");
     scanw("%d", &opc);
     
@@ -191,17 +199,71 @@ void consultarPedido(FILE *fpPe, FILE *fpC){
                 &pedido.codigoPedido,&pedido.codigoCliente,&pedido.codigoProduto,&pedido.quantidade,
                 pedido.data,pedido.descricao,&pedido.valorTotal,pedido.status) == 8){
     
-    if(pedido.codigoCliente == opc && pedido.codigoCliente == codigoCliente){
+    if(pedido.codigoPedido == opc && pedido.codigoCliente == codigoCliente && pedido.codigoPedido != 0){
         printw("\n=====DETALHES DO PEDIDO=====\n");
         printw("Cliente: %d\nProduto: %d\nQuantidade: %d\nData: %s\nStatus: %s\nValor: %.2f\nDescrição: %s\n",&pedido.codigoPedido,&pedido.codigoCliente,&pedido.codigoProduto,&pedido.quantidade,
                 pedido.data,pedido.descricao,&pedido.valorTotal,pedido.status);
+        }
     }
 }
 
 void atualizarPedido(FILE *fpPe){
-    
+    //EM PROCESSO
+    rewind(fpPe);
 }
 
-FILE* deletarPedido(FILE *fpPe){
+FILE* deletarPedido(FILE *fpPe, FILE *fpC){
+    rewind(fpPe);
     
+    int codigoCliente, opc, encontro = 0;
+    Pedido pedido;
+    
+    printw("\nInforme o código do Cliente:\n");
+    scanw("%d", &codigoCliente);
+    getch();
+    
+    if(!codigoClienteJaExiste(fpC,codigoCliente)){
+        printw("\nErro: Cliente não encontrado!\n");
+        getch();
+        return fpPe;
+    }
+    
+    clear();
+    printw("\n=====PEDIDOS DO CLIENTE %d=====\n", codigoCliente);
+    
+    while(fscanf(fpPe, "%d,%d,%d,%d,%10[^,],%99[^,],%f,%19[^\n]",
+                &pedido.codigoPedido,&pedido.codigoCliente,&pedido.codigoProduto,&pedido.quantidade,
+                pedido.data,pedido.descricao,&pedido.valorTotal,pedido.status) == 8){
+                
+        if(pedido.codigoCliente == codigoCliente && pedido.codigoPedido != 0){
+            printw("\nCódigo do Pedido: %d | Descrição: %s | Quantidade: %d\n",
+                    pedido.codigoPedido,pedido.descricao,pedido.quantidade);
+            encontro = 1;
+        }
+    }
+    
+    if(encontro == 0){
+        printw("\nErro: Nenhum Pedido Encontrado!\n");
+        getch();
+        return fpPe;
+    }
+    
+    printw("\nInforme o código do pedido que você deseja desfazer:\n");
+    scanw("%d", &opc);
+    getch();
+    
+    rewind(fpPe);
+    
+    while(fscanf(fpPe, "%d,%d,%d,%d,%10[^,],%99[^,],%f,%19[^\n]",
+                &pedido.codigoPedido,&pedido.codigoCliente,&pedido.codigoProduto,&pedido.quantidade,
+                pedido.data,pedido.descricao,&pedido.valorTotal,pedido.status) == 8){
+                    
+        if(pedido.codigoPedido == opc){
+            pedido.codigoPedido = 0;
+            printw("\nO pedido foi desfeito com sucesso!\n");
+            getch();
+            break;
+        }
+    }
+    return fpPe;
 }
