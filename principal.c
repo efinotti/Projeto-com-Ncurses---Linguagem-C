@@ -4,7 +4,7 @@
 #include <string.h>
 
 #include "cliente/cliente.h"
-#include "Produtos.h"
+#include "produto/Produtos.h"
 
 typedef struct {
     int identificadorProduto;
