@@ -54,14 +54,14 @@ int codigoClienteJaExiste(FILE* fp, int code) {
 
     int identificador;
     char nome[maxNome];
-    int telefone;
+    double telefone;
     char email[maxEmail];
     char rua[maxEndereco], setor[maxEndereco], cidade[maxEndereco],
         estado[maxEndereco];
     char cpf[tamCPF], razaoSocial[maxRazao], cnpj[tamCNPJ];
 
     while (fscanf(fp,
-                  "%d,%29[^,],%d,%49[^,],%39[^,],%39[^,],%39[^,],%39[^,],%11[^,"
+                  "%d,%29[^,],%lf,%49[^,],%39[^,],%39[^,],%39[^,],%39[^,],%11[^,"
                   "],%39[^,],%14[^\n]\n",
                   &identificador, nome, &telefone, email, rua, setor, cidade,
                   estado, cpf, razaoSocial, cnpj) == 11) {
@@ -138,7 +138,7 @@ void cadastrarClientes(FILE* fp) {
 
                         printw(
                             "Digite o número de telefone (somente números): ");
-                        scanw("%d", &cliente.telefone);
+                        scanw("%lf", &cliente.telefone);
                         getch();
 
                         printw("Digite o seu email: ");
@@ -173,7 +173,7 @@ void cadastrarClientes(FILE* fp) {
                         }
                         noecho();
 
-                        fprintf(fp, "%d,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s\n",
+                        fprintf(fp, "%d,%s,%.0lf,%s,%s,%s,%s,%s,%s,%s,%s\n",
                                 cliente.identificador, cliente.nome,
                                 cliente.telefone, cliente.email,
                                 cliente.endereco.rua, cliente.endereco.setor,
@@ -257,7 +257,7 @@ void cadastrarClientes(FILE* fp) {
                         printw(
                             "Digite o telefone para contato (somente "
                             "números): ");
-                        scanw("%d", &cliente.telefone);
+                        scanw("%lf", &cliente.telefone);
                         getch();
 
                         printw("Digite o seu email: ");
@@ -292,7 +292,7 @@ void cadastrarClientes(FILE* fp) {
                         }
                         noecho();
 
-                        fprintf(fp, "%d,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s\n",
+                        fprintf(fp, "%d,%s,%.0lf,%s,%s,%s,%s,%s,%s,%s,%s\n",
                                 cliente.identificador, cliente.nome,
                                 cliente.telefone, cliente.email,
                                 cliente.endereco.rua, cliente.endereco.setor,
@@ -328,7 +328,7 @@ void consultarClientes(FILE* fp) {
     clear();
     int identificador;
     char nome[maxNome];
-    int telefone;
+    double telefone;
     char email[maxEmail];
     char rua[maxEndereco], setor[maxEndereco], cidade[maxEndereco],
         estado[maxEndereco];
@@ -346,13 +346,13 @@ void consultarClientes(FILE* fp) {
     refresh();
 
     while (fscanf(fp,
-                  "%d,%29[^,],%d,%49[^,],%39[^,],%39[^,],%39[^,],%39[^,],%11[^,"
+                  "%d,%29[^,],%lf,%49[^,],%39[^,],%39[^,],%39[^,],%39[^,],%11[^,"
                   "],%39[^,],%14[^\n]\n",
                   &identificador, nome, &telefone, email, rua, setor, cidade,
                   estado, cpf, razaoSocial, cnpj) == 11) {
         if (identificador == code) {
             contador++;
-            printw("%d,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s\n", identificador, nome,
+            printw("%d,%s,%.0lf,%s,%s,%s,%s,%s,%s,%s,%s\n", identificador, nome,
                    telefone, email, rua, setor, cidade, estado, cpf,
                    razaoSocial, cnpj);
         }
@@ -371,7 +371,7 @@ FILE* deletarClientes(FILE* fp) {
     clear();
     int identificador;
     char nome[maxNome];
-    int telefone;
+    double telefone;
     char email[maxEmail];
     char rua[maxEndereco], setor[maxEndereco], cidade[maxEndereco],
         estado[maxEndereco];
@@ -399,12 +399,12 @@ FILE* deletarClientes(FILE* fp) {
     rewind(fp);
 
     while (fscanf(fp,
-                  "%d,%29[^,],%d,%49[^,],%39[^,],%39[^,],%39[^,],%39[^,],%11[^,"
+                  "%d,%29[^,],%lf,%49[^,],%39[^,],%39[^,],%39[^,],%39[^,],%11[^,"
                   "],%39[^,],%14[^\n]\n",
                   &identificador, nome, &telefone, email, rua, setor, cidade,
                   estado, cpf, razaoSocial, cnpj) == 11) {
         if (identificador != code) {
-            fprintf(fpTemp, "%d,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s\n", identificador,
+            fprintf(fpTemp, "%d,%s,%.0lf,%s,%s,%s,%s,%s,%s,%s,%s\n", identificador,
                     nome, telefone, email, rua, setor, cidade, estado, cpf,
                     razaoSocial, cnpj);
         } else {
@@ -444,7 +444,7 @@ void listarClientes(FILE* fp) {
     clear();
     int identificador;
     char nome[maxNome];
-    int telefone;
+    double telefone;
     char email[maxEmail];
     char rua[maxEndereco], setor[maxEndereco], cidade[maxEndereco],
         estado[maxEndereco];
@@ -457,13 +457,14 @@ void listarClientes(FILE* fp) {
     printw("===== LISTA DE TODOS OS CLIENTES =====\n\n");
 
     while (fscanf(fp,
-                  "%d,%29[^,],%d,%49[^,],%39[^,],%39[^,],%39[^,],%39[^,],%11[^,"
+                  "%d,%29[^,],%lf,%49[^,],%39[^,],%39[^,],%39[^,],%39[^,],%11[^,"
                   "],%39[^,],%14[^\n]\n",
                   &identificador, nome, &telefone, email, rua, setor, cidade,
                   estado, cpf, razaoSocial, cnpj) == 11) {
-        printw("%d,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s\n", identificador, nome,
+        printw("%d,%s,%.0lf,%s,%s,%s,%s,%s,%s,%s,%s\n", identificador, nome,
                telefone, email, rua, setor, cidade, estado, cpf, razaoSocial,
                cnpj);
+        contador++;
     }
 
     if (contador == 0) {

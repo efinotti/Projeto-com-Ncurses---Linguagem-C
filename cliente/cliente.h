@@ -26,7 +26,7 @@ typedef struct {
 typedef struct {
     int identificador;
     char nome[maxNome];
-    int telefone;
+    double telefone;
     char email[maxEmail];
     Endereco endereco;
     char cpf[tamCPF];

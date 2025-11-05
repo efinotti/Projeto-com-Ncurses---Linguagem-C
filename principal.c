@@ -6,6 +6,8 @@
 #include "cliente/cliente.h"
 #include "produto/Produtos.h"
 
+WINDOW* window;
+
 typedef struct {
     int identificadorProduto;
     int identificadorPedido;
@@ -29,7 +31,12 @@ int sair(FILE* fpC, FILE* fpP, FILE* fpPe) {
     return 0;
 }
 
+
+
 int menuInicial() {
+    WINDOW * abrirJanela;
+
+
     initscr();
     start_color();
     init_pair(1, COLOR_YELLOW, COLOR_BLACK);
@@ -47,6 +54,15 @@ int menuInicial() {
     scanw("%d", &valor);
     getch();
     return valor;
+}
+
+WINDOW* abrirJanela(int altura, int largura, int posicaoX, int posicaoY){
+ 	WINDOW* window = newwin(altura, largura, posicaoY, posicaoY);
+	box(window, 0 , 0);
+    wclear(window);
+	wrefresh(window);
+
+    return window;
 }
 
 int manterClientes() {
@@ -81,6 +97,7 @@ int manterProdutos() {
 }
 
 int main() {
+
     FILE* fpClientes = fopen("clientes.csv", "a+");
     FILE* fpProdutos = fopen("produtos.csv", "a+");
     FILE* fpPedidos = fopen("pedidos.csv", "a+");
