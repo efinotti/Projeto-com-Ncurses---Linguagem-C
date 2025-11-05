@@ -6,8 +6,6 @@
 #include "cliente/cliente.h"
 #include "produto/Produtos.h"
 
-WINDOW* window;
-
 typedef struct {
     int identificadorProduto;
     int identificadorPedido;
