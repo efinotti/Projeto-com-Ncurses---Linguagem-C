@@ -27,13 +27,13 @@ typedef struct {
 }Pedido;
 
 Pedido listaPedidos[maxPedidos];
-
 extern int totalPedidos;
+
 int codigoPedidoJaExiste(FILE * fpPe, int code);
-void cadastrarPedido(FILE *fpPe);
+void cadastrarPedido(FILE *fpPe, FILE *fpC, FILE *fpP);
 void listarPedidos(FILE *fpPe);
-void consultarPedido(FILE *fpPe, int code);
-FILE* deletarPedido(FILE* fpPe);
+void consultarPedido(FILE *fpPe, FILE *fpC);
+FILE* deletarPedido(FILE *fpPe, FILE *fpC);
 void atualizarStatusPedido(FILE *fpPe, int code, const char *novoStatus);
 void obterDataAtual(char *destino, int tamanho);
 

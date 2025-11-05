@@ -1,5 +1,6 @@
 #include "pedido.h"
 
+Pedido listaPedidos[maxPedidos];
 int totalPedidos = 0;
 
 void obterDataAtual(char *destino, int tamanho){
@@ -228,7 +229,7 @@ void atualizarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
     clear();
     printw("\n=====PEDIDOS DO CLIENTE %d=====\n", codigoCliente);
     
-    for (i = 0; i < totalPedidos; i++) {
+    for (int i = 0; i < totalPedidos; i++) {
         if (listaPedidos[i].codigoCliente == codigoCliente && listaPedidos[i].codigoPedido != 0) {
             printw("Código Pedido: %d | Produto: %d | Quantidade: %d | Descrição: %s | Status: %s\n",
                    listaPedidos[i].codigoPedido,
@@ -249,7 +250,7 @@ void atualizarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
     printw("\nDigite o código do pedido que deseja modificar:\n");
     scanw("%d", &opc);
 
-    for (i = 0; i < totalPedidos; i++) {
+    for (int i = 0; i < totalPedidos; i++) {
         if (listaPedidos[i].codigoPedido == opc && listaPedidos[i].codigoCliente == codigoCliente) {
 
             printw("\n===== MENU DE MODIFICAÇÕES =====\n");
