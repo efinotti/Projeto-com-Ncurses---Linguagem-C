@@ -1,5 +1,7 @@
 #include "pedido.h"
 
+int totalPedidos = 0;
+
 void obterDataAtual(char *destino, int tamanho){
     time_t agora = time(NULL);
     struct tm *tm_info = localtime(&agora);
@@ -31,19 +33,19 @@ int codigoClienteJaExiste(FILE* fpC, int code){
 int codigoProdutoJaExiste(FILE* fpP, int code){
     rewind(fpP);
 
-    int codigoProduto;
-    char nome[maxNome];
+    int identificador;
     char descricao[maxDescricao];
-    float preco;
-    int quantidade;
+    double preco;
+    int estoque;
 
-    while(fscanf(fpP,"%d,%[^,],%[^,],%f,%d\n",&codigoProduto, nome, descricao, &preco, &quantidade) == 5){
-        if(codigoProduto == code){
+    while (fscanf(fpP, "%d,%[^,],%lf,%d\n", &identificador, descricao, &preco, &estoque) == 4) {
+        if (identificador == code) {
             return 1;
         }
     }
     return 0;
 }
+
 
 int codigoPedidoJaExiste(FILE* fpPe, int code){
     rewind(fpPe);
@@ -201,15 +203,97 @@ void consultarPedido(FILE *fpPe, FILE *fpC){
     
     if(pedido.codigoPedido == opc && pedido.codigoCliente == codigoCliente && pedido.codigoPedido != 0){
         printw("\n=====DETALHES DO PEDIDO=====\n");
-        printw("Cliente: %d\nProduto: %d\nQuantidade: %d\nData: %s\nStatus: %s\nValor: %.2f\nDescrição: %s\n",&pedido.codigoPedido,&pedido.codigoCliente,&pedido.codigoProduto,&pedido.quantidade,
-                pedido.data,pedido.descricao,&pedido.valorTotal,pedido.status);
+        printw("Cliente: %d\nProduto: %d\nQuantidade: %d\nData: %s\nStatus: %s\nValor: %.2f\nDescrição: %s\n",pedido.codigoPedido,pedido.codigoCliente,pedido.codigoProduto,pedido.quantidade,
+                pedido.data,pedido.descricao,pedido.valorTotal,pedido.status);
         }
     }
 }
 
-void atualizarPedido(FILE *fpPe){
-    //EM PROCESSO
+void atualizarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
     rewind(fpPe);
+    
+    int codigoCliente, opc, mod, encontro = 0;
+    Pedido pedido;
+    
+    printw("\nInforme o código do Cliente:\n");
+    scanw("%d",&codigoCliente);
+    getch();
+    
+    if(!codigoClienteJaExiste(fpC,codigoCliente)){
+        printw("\nErro: Cliente não encontrado!\n");
+        getch();
+        return fpPe;
+    }
+    
+    clear();
+    printw("\n=====PEDIDOS DO CLIENTE %d=====\n", codigoCliente);
+    
+    for (i = 0; i < totalPedidos; i++) {
+        if (listaPedidos[i].codigoCliente == codigoCliente && listaPedidos[i].codigoPedido != 0) {
+            printw("Código Pedido: %d | Produto: %d | Quantidade: %d | Descrição: %s | Status: %s\n",
+                   listaPedidos[i].codigoPedido,
+                   listaPedidos[i].codigoProduto,
+                   listaPedidos[i].quantidade,
+                   listaPedidos[i].descricao,
+                   listaPedidos[i].status);
+            encontro = 1;
+        }
+    }
+
+    if (!encontro) {
+        printw("\nNenhum pedido encontrado!\n");
+        getch();
+        return;
+    }
+
+    printw("\nDigite o código do pedido que deseja modificar:\n");
+    scanw("%d", &opc);
+
+    for (i = 0; i < totalPedidos; i++) {
+        if (listaPedidos[i].codigoPedido == opc && listaPedidos[i].codigoCliente == codigoCliente) {
+
+            printw("\n===== MENU DE MODIFICAÇÕES =====\n");
+            printw("1 - Código do Produto\n2 - Quantidade\n3 - Descrição\n4 - Status\n");
+            printw("Qual campo deseja modificar?:\n");
+            scanw("%d", &mod);
+
+            switch(mod){
+                case 1:
+                    printw("Novo código do produto:\n");
+                    scanw("%d", &listaPedidos[i].codigoProduto);
+                    printw("\nAlteração feita com sucesso!\n");
+                    break;
+
+                case 2:
+                    printw("Nova quantidade:\n");
+                    scanw("%d", &listaPedidos[i].quantidade);
+                    printw("\nAlteração feita com sucesso!\n");
+                    break;
+
+                case 3:
+                    printw("Nova descrição:\n");
+                    scanw("%s", listaPedidos[i].descricao);
+                    printw("\nAlteração feita com sucesso!\n");
+                    break;
+
+                case 4:
+                    printw("Novo status:\n");
+                    scanw("%s", listaPedidos[i].status);
+                    printw("\nAlteração feita com sucesso!\n");
+                    break;
+
+                default:
+                    printw("Erro: Opção Inválida!\n");
+                    break;
+            }
+
+            getch();
+            return;
+        }
+    }
+
+    printw("\nErro: Pedido não encontrado!\n");
+    getch();
 }
 
 FILE* deletarPedido(FILE *fpPe, FILE *fpC){
