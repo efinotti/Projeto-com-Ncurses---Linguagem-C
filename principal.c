@@ -5,6 +5,7 @@
 
 #include "cliente/cliente.h"
 #include "produto/Produtos.h"
+#include "pedido/pedido.h"
 
 typedef struct {
     int identificadorProduto;
@@ -73,6 +74,22 @@ int manterProdutos() {
     printw("3) Remover Produtos\n");
     printw("4) Listar Produtos\n");
     printw("5) Voltar\n\n");
+    printw("Digite a opção escolhida: ");
+    scanw("%d", &x);
+    getch();
+    refresh();
+    return x;
+}
+int manterPedidos() {
+    int x;
+    clear();
+    printw("===== MANTER PEDIDOS =====\n\n");
+    printw("1) Cadastro de Pedidos\n");
+    printw("2) Consultar Pedidos\n");
+    printw("3) Remover Pedidos\n");
+    printw("4) Listar Pedidos\n");
+    printw("5) Atualizar Pedido\n");
+    printw("6) Voltar\n\n");
     printw("Digite a opção escolhida: ");
     scanw("%d", &x);
     getch();
@@ -159,11 +176,35 @@ int main() {
                 } while (produtoValor != 5);
                 break;
             case 3:
-                printw("Você escolheu: Manter Pedidos (Não implementado)\n");
-                refresh();
-                getch();
-                break;
+                int pedidoValor;
+                do{
+                    pedidoValor = manterPedidos();
+                    switch(pedidoValor){
+                        case 1:
+                            cadastrarPedido(fpPedidos, fpClientes, fpProdutos);
+                            break;
+                        case 2:
+                            consultarPedido(fpPedidos, fpClientes);
+                            break;
+                        case 3:
+                            deletarPedido(fpPedidos, fpClientes);
+                            break;
+                        case 4:
+                            listarPedidos(fpPedidos);
+                            break;
+                        case 5:
+                            atualizarPedido(fpPedidos);
+                            break;
+                        case 6:
+                            break;
+                        default:
+                            printw("Código Inválido! Tente novamente um código válido.");
+                            refresh();
+                            getch();
+                            break;
+                    }
 
+                }while (pedidoValor != 6);
             case 4:
                 clear();
                 printw("Saindo do programa...\n");

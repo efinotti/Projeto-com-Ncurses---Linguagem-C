@@ -78,6 +78,7 @@ void cadastrarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
     printw("\n\n=====CADASTRO DE PEDIDO=====\n\n");
 
     printw("Digite o código do pedido (não pode ser 0):\n");
+    fflush(stdout);
     scanw("%d", &pedido.codigoPedido);
     getch();
 
@@ -88,6 +89,7 @@ void cadastrarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
     }
 
     printw("Digite o código do cliente:\n");
+    fflush(stdout);
     scanw("%d", &pedido.codigoCliente);
     getch();
     
@@ -98,6 +100,7 @@ void cadastrarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
     }
 
     printw("Digite o código do Produto:\n");
+    fflush(stdout);
     scanw("%d", &pedido.codigoProduto);
     getch();
     
@@ -108,6 +111,7 @@ void cadastrarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
     }
     
     printw("Digite a quantidade de itens:\n");
+    fflush(stdout);
     scanw("%d", &pedido.quantidade);
     getch();
 
@@ -117,10 +121,12 @@ void cadastrarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
     getch();
     
     printw("Faça a descrição do produto:\n");
+    fflush(stdout);
     scanw("%s", pedido.descricao);
     getch();
     
     printw("Digite o valor total do produto:\n");
+    fflush(stdout);
     scanw("%f", &pedido.valorTotal);
     getch();
     
@@ -164,6 +170,7 @@ void consultarPedido(FILE *fpPe, FILE *fpC){
     Pedido pedido;
     
     printw("\nInforme o código do Cliente:\n");
+    fflush(stdout);
     scanw("%d", &codigoCliente);
     getch();
     
@@ -194,6 +201,7 @@ void consultarPedido(FILE *fpPe, FILE *fpC){
     }
     
     printw("\nQual pedido você deseja consultar?:\n");
+    fflush(stdout);
     scanw("%d", &opc);
     
     rewind(fpPe);
@@ -217,6 +225,7 @@ void atualizarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
     Pedido pedido;
     
     printw("\nInforme o código do Cliente:\n");
+    fflush(stdout);
     scanw("%d",&codigoCliente);
     getch();
     
@@ -248,6 +257,7 @@ void atualizarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
     }
 
     printw("\nDigite o código do pedido que deseja modificar:\n");
+    fflush(stdout);
     scanw("%d", &opc);
 
     for (int i = 0; i < totalPedidos; i++) {
@@ -256,29 +266,34 @@ void atualizarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
             printw("\n===== MENU DE MODIFICAÇÕES =====\n");
             printw("1 - Código do Produto\n2 - Quantidade\n3 - Descrição\n4 - Status\n");
             printw("Qual campo deseja modificar?:\n");
+            fflush(stdout);
             scanw("%d", &mod);
 
             switch(mod){
                 case 1:
                     printw("Novo código do produto:\n");
+                    fflush(stdout);
                     scanw("%d", &listaPedidos[i].codigoProduto);
                     printw("\nAlteração feita com sucesso!\n");
                     break;
 
                 case 2:
                     printw("Nova quantidade:\n");
+                    fflush(stdout);
                     scanw("%d", &listaPedidos[i].quantidade);
                     printw("\nAlteração feita com sucesso!\n");
                     break;
 
                 case 3:
                     printw("Nova descrição:\n");
+                    fflush(stdout);
                     scanw("%s", listaPedidos[i].descricao);
                     printw("\nAlteração feita com sucesso!\n");
                     break;
 
                 case 4:
                     printw("Novo status:\n");
+                    fflush(stdout);
                     scanw("%s", listaPedidos[i].status);
                     printw("\nAlteração feita com sucesso!\n");
                     break;
@@ -304,6 +319,7 @@ FILE* deletarPedido(FILE *fpPe, FILE *fpC){
     Pedido pedido;
     
     printw("\nInforme o código do Cliente:\n");
+    fflush(stdout);
     scanw("%d", &codigoCliente);
     getch();
     
@@ -334,6 +350,7 @@ FILE* deletarPedido(FILE *fpPe, FILE *fpC){
     }
     
     printw("\nInforme o código do pedido que você deseja desfazer:\n");
+    fflush(stdout);
     scanw("%d", &opc);
     getch();
     
@@ -350,5 +367,7 @@ FILE* deletarPedido(FILE *fpPe, FILE *fpC){
             break;
         }
     }
+    
+    fflush(fpPe);
     return fpPe;
 }
