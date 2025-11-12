@@ -20,4 +20,10 @@ typedef struct {
     int estoque;
 } Produtos;
 
+int codigoProdutoJaExiste(FILE* fp, int code);
+void cadastrarProdutos(FILE* fp);
+void consultarProdutos(FILE* fp);
+void deletarProdutos(FILE* fp_origem);
+void listarProdutos(FILE *fp);
+
 #endif

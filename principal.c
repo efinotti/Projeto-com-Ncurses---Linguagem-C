@@ -193,7 +193,7 @@ int main() {
                             listarPedidos(fpPedidos);
                             break;
                         case 5:
-                            atualizarPedido(fpPedidos);
+                            atualizarPedido(fpPedidos,fpClientes,fpProdutos);
                             break;
                         case 6:
                             break;
