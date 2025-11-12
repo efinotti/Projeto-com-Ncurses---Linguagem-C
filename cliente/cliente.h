@@ -7,7 +7,7 @@
 #define maxEmail 50
 #define maxDescricao 100
 #define maxEndereco 40
-#define maxData 10
+#define maxData 11
 #define tamCPF 12
 #define tamCNPJ 15
 

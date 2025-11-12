@@ -11,26 +11,6 @@ void obterDataAtual(char *destino, int tamanho){
         tm_info->tm_mday, tm_info->tm_mon + 1, tm_info->tm_year + 1900);
 }
 
-int codigoClienteJaExiste(FILE* fpC, int code){
-    rewind(fpC);
-    
-    int identificador;
-    char nome[maxNome];
-    int telefone;
-    char email[maxEmail];
-    char rua[maxEndereco], setor[maxEndereco], cidade[maxEndereco],estado[maxEndereco];
-    char cpf[tamCPF], razaoSocial[maxRazao], cnpj[tamCNPJ];
-
-    while (fscanf(fpC,"%d,%29[^,],%d,%49[^,],%39[^,],%39[^,],%39[^,],%39[^,],%11[^,],%39[^,],%14[^\n]\n",
-                  &identificador, nome, &telefone, email, rua, setor, cidade,estado,
-                  cpf, razaoSocial, cnpj) == 11) {
-        if (identificador == code) {
-            return 1;
-        }
-    }
-    return 0;
-}
-
 int codigoProdutoJaExiste(FILE* fpP, int code){
     rewind(fpP);
 
@@ -163,7 +143,7 @@ void listarPedidos(FILE *fpPe){
     getch();
 }
 
-void consultarPedido(FILE *fpPe, FILE *fpC){
+int consultarPedido(FILE *fpPe, FILE *fpC){
     rewind(fpPe);
     
     int codigoCliente, opc, encontro = 0;
@@ -177,7 +157,7 @@ void consultarPedido(FILE *fpPe, FILE *fpC){
     if(!codigoClienteJaExiste(fpC,codigoCliente)){
         printw("\nErro: Cliente não encontrado!\n");
         getch();
-        return;
+        return 0;
     }
     
     clear();
@@ -197,7 +177,7 @@ void consultarPedido(FILE *fpPe, FILE *fpC){
     if(encontro == 0){
         printw("\nErro: Nenhum Pedido Encontrado!\n");
         getch();
-        return fpPe;
+        return 0;
     }
     
     printw("\nQual pedido você deseja consultar?:\n");
@@ -212,13 +192,13 @@ void consultarPedido(FILE *fpPe, FILE *fpC){
     
     if(pedido.codigoPedido == opc && pedido.codigoCliente == codigoCliente && pedido.codigoPedido != 0){
         printw("\n=====DETALHES DO PEDIDO=====\n");
-        printw("Cliente: %d\nProduto: %d\nQuantidade: %d\nData: %s\nStatus: %s\nValor: %.2f\nDescrição: %s\n",pedido.codigoPedido,pedido.codigoCliente,pedido.codigoProduto,pedido.quantidade,
-                pedido.data,pedido.descricao,pedido.valorTotal,pedido.status);
+        printw("Cliente: %d\nProduto: %d\nQuantidade: %d\nData: %s\nStatus: %s\nValor: %.2f\nDescrição: %s\n",pedido.codigoCliente,pedido.codigoProduto,pedido.quantidade,
+                pedido.data,pedido.status,pedido.valorTotal,pedido.descricao);
         }
     }
 }
 
-void atualizarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
+int atualizarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
     rewind(fpPe);
     
     int codigoCliente, opc, mod, encontro = 0;
@@ -232,7 +212,7 @@ void atualizarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
     if(!codigoClienteJaExiste(fpC,codigoCliente)){
         printw("\nErro: Cliente não encontrado!\n");
         getch();
-        return fpPe;
+        return 0;
     }
     
     clear();
@@ -253,7 +233,7 @@ void atualizarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
     if (!encontro) {
         printw("\nNenhum pedido encontrado!\n");
         getch();
-        return;
+        return 0;
     }
 
     printw("\nDigite o código do pedido que deseja modificar:\n");
@@ -304,7 +284,7 @@ void atualizarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
             }
 
             getch();
-            return;
+            return 0;
         }
     }
 

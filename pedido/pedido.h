@@ -12,8 +12,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "cliente.h"
-#include "Produtos.h"
+#include "../cliente/cliente.h"
+#include "../produto/Produtos.h"
 
 typedef struct {
     int codigoPedido;
@@ -26,15 +26,14 @@ typedef struct {
     char status[maxStatus];
 }Pedido;
 
-Pedido listaPedidos[maxPedidos];
 extern int totalPedidos;
 
 int codigoPedidoJaExiste(FILE * fpPe, int code);
 void cadastrarPedido(FILE *fpPe, FILE *fpC, FILE *fpP);
 void listarPedidos(FILE *fpPe);
-void consultarPedido(FILE *fpPe, FILE *fpC);
+int consultarPedido(FILE *fpPe, FILE *fpC);
 FILE* deletarPedido(FILE *fpPe, FILE *fpC);
-void atualizarStatusPedido(FILE *fpPe, int code, const char *novoStatus);
+int atualizarPedido(FILE *fpPe,  FILE *fpC, FILE *fpP);
 void obterDataAtual(char *destino, int tamanho);
 
 #endif

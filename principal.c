@@ -142,6 +142,7 @@ int main() {
                 break;
             }
             case 2:
+            /** 
                 int produtoValor;
                 do {
                     produtoValor = manterProdutos();
@@ -174,6 +175,7 @@ int main() {
                     }
 
                 } while (produtoValor != 5);
+                */
                 break;
             case 3:
                 int pedidoValor;
@@ -193,7 +195,7 @@ int main() {
                             listarPedidos(fpPedidos);
                             break;
                         case 5:
-                            atualizarPedido(fpPedidos);
+                            atualizarPedido(fpPedidos,fpClientes,fpProdutos);
                             break;
                         case 6:
                             break;
