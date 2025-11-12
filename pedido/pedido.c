@@ -11,22 +11,6 @@ void obterDataAtual(char *destino, int tamanho){
         tm_info->tm_mday, tm_info->tm_mon + 1, tm_info->tm_year + 1900);
 }
 
-int codigoProdutoJaExiste(FILE* fpP, int code){
-    rewind(fpP);
-
-    int identificador;
-    char descricao[maxDescricao];
-    double preco;
-    int estoque;
-
-    while (fscanf(fpP, "%d,%[^,],%lf,%d\n", &identificador, descricao, &preco, &estoque) == 4) {
-        if (identificador == code) {
-            return 1;
-        }
-    }
-    return 0;
-}
-
 
 int codigoPedidoJaExiste(FILE* fpPe, int code){
     rewind(fpPe);

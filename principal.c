@@ -7,6 +7,9 @@
 #include "produto/Produtos.h"
 #include "pedido/pedido.h"
 
+int intKey;
+WINDOW *janelaPrincipal;
+
 typedef struct {
     int identificadorProduto;
     int identificadorPedido;
@@ -30,24 +33,27 @@ int sair(FILE* fpC, FILE* fpP, FILE* fpPe) {
     return 0;
 }
 
-int menuInicial() {
-    initscr();
-    start_color();
-    init_pair(1, COLOR_YELLOW, COLOR_BLACK);
-    init_pair(2, COLOR_BLUE, COLOR_BLACK);
+int highlight = 1;
+int choice = 0;
+
+void menuInicial() {
     clear();
-    bkgd(COLOR_PAIR(2));
-    printw("===== MENU INICIAL =====\n\n");
-    printw("1) Manter Clientes\n");
-    printw("2) Manter Produtos\n");
-    printw("3) Manter Pedidos\n");
-    printw("4) Sair\n\n");
-    printw("Selecione uma opção: ");
+
+    mvprintw(0, 0,"===== MENU INICIAL =====\n\n");
+    mvprintw(10, 10,"1) Manter Clientes\n");
+    mvprintw(5,5, "2) Manter Produtos\n");
+    mvprintw(6,5, "3) Manter Pedidos\n");
+    mvprintw(8, 5, "4) Sair\n\n");
+    mvprintw(10, 5, "Selecione uma opção: ");
     refresh();
-    int valor;
-    scanw("%d", &valor);
-    getch();
-    return valor;
+    intKey = wgetch(janelaPrincipal);
+    
+    while (true) {
+        getchar();
+    }
+    clear();
+
+    
 }
 
 int manterClientes() {
@@ -107,10 +113,25 @@ int main() {
         return EXIT_FAILURE;
     }
 
-    int inicioValor;
+    janelaPrincipal = newwin(256, 256, 0, 0);
+    keypad(janelaPrincipal, TRUE);
+    initscr();
+    start_color();
+    init_pair(1, COLOR_YELLOW, COLOR_BLACK);
+    init_pair(2, COLOR_BLUE, COLOR_BLACK);
+    clear();
+    bkgd(COLOR_PAIR(2));
 
-    do {
-        inicioValor = menuInicial();
+    menuInicial();
+
+    refresh();
+
+    getchar();
+
+    clear();
+/** 
+        int inicioValor;
+
         clear();
         switch (inicioValor) {
             case 1: {
@@ -216,11 +237,12 @@ int main() {
                 getch();
                 break;
         }
-    } while (inicioValor != 4);
+     */
 
     printw("\nPressione qualquer tecla para sair...");
-    refresh();
     getch();
+
+    refresh();
     sair(fpClientes, fpProdutos, fpPedidos);
     return EXIT_SUCCESS;
 }
