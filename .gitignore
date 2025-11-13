@@ -1,0 +1,29 @@
+# Arquivos de dados
+clientes.csv
+produtos.csv
+pedidos.csv
+
+# Binários e objetos de compilação
+*.o
+*.out
+*.exe
+*.bin
+*.obj
+
+# Executável gerado pelo gcc
+sistema
+
+*.swp
+*.bak
+*.log
+*.tmp
+*.DS_Store
+
+
+/build/
+/dist/
+/debug/
+/release/
+
+.vscode/
+*.cbp
