@@ -116,9 +116,6 @@ int manterClientes() {
     };
 
     int numOpcoes = sizeof(escolhas) / sizeof(char*);
-    clear();
-
-    
 
     while (escolha == -1) {
         clear();
