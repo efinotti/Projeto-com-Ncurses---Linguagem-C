@@ -1,7 +1,5 @@
 # Projeto em C com Ncurses
 
-Um breve parágrafo descrevendo o que seu projeto faz. Por exemplo: "Este é um projeto desenvolvido em linguagem C que utiliza a biblioteca ncurses para criar uma interface de usuário baseada em texto no terminal."
-
 ## 🚀 Sobre o Projeto
 
 Este projeto é um Sistema de Gerenciamento de Vendas (ou um "mini-ERP") desenvolvido inteiramente em Linguagem C. Ele foi criado como uma solução robusta e leve para simular as operações básicas de um pequeno negócio, rodando diretamente no terminal.
