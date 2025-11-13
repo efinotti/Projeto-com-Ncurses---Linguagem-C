@@ -112,7 +112,7 @@ int manterClientes() {
         "1) Cadastrar Clientes",
         "2) Consultar Clientes",
         "3) Remover Clientes",
-        "4) Deletar Clientes"
+        "4) Listar Clientes"
     };
 
     int numOpcoes = sizeof(escolhas) / sizeof(char*);
