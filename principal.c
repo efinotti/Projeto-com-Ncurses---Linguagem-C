@@ -1,0 +1,340 @@
+#include <ncurses.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "cliente/cliente.h"
+#include "pedido/pedido.h"
+#include "produto/Produtos.h"
+
+WINDOW* janelaPrincipal;
+
+typedef struct {
+    int identificadorProduto;
+    int identificadorPedido;
+    int quantidade;
+    double precoSubtotal;
+} ItemPedidos;
+
+typedef struct {
+    int identificadorAutoral;
+    int identificadorCliente;
+    int itens;
+    char data[maxData];
+    double precoTotal;
+} Pedidos;
+
+int sair(FILE* fpC, FILE* fpP, FILE* fpPe) {
+    fclose(fpC);
+    fclose(fpP);
+    fclose(fpPe);
+    endwin();
+    return 0;
+}
+
+int menuInicial() {
+    char* escolhas[] = {"1) Manter Clientes", "2) Manter Produtos",
+                        "3) Manter Pedidos", "4) Sair"};  // Escolhas
+
+    /**
+     * Inclusive, usar essa ideia pra realizarmos a listagem dos clientes,
+     * produtos e pedidos. Ele lista todos os clientes, e a medida que a gente
+     * vai "escolhendo" os logs, ele imprime individualmente do lado os dados.
+     * Vou começar a já pensar nisso para o clientes.
+     */
+
+    int numEscolhas = sizeof(escolhas) / sizeof(char*);
+    /**
+     * Divido o tamanho dos arrays pelo tamanho do ponteiro char (descubro o
+     * a quantidade de escolhas)
+     */
+    int tecla;
+    int destaque = 0;  // O destaque começa no primeiro item
+    int escolha = -1;  // A escolha começa em -1 pois nada foi escolhido
+
+    clear();
+    mvprintw(0, 0, "===== MENU INICIAL =====\n\n");
+    mvprintw(2, 5,
+             "Use as setas para navegar. Pressione ENTER para selecionar.");
+
+    while (escolha == -1) {
+        for (int i = 0; i < numEscolhas; i++) {
+            int y = 5 + i;  // Imprimir na tela com separação
+            int x = 5;
+
+            if (i == destaque) {
+                attron(A_REVERSE);
+                /**
+                 * Sempre que i especificamente é o valor que está escolhido
+                 * utilizando a tecla, ele altera a cor da fonte pela cor do
+                 * fundo escolhido
+                 */
+            }
+
+            mvprintw(y, x, "%s",
+                     escolhas[i]);  // Imprimive individualmente na tela
+            attroff(A_REVERSE);
+        }
+        refresh();
+
+        tecla = getch();
+
+        switch (tecla) {
+            case KEY_UP:
+                destaque--;
+                if (destaque < 0) {
+                    destaque = numEscolhas - 1;
+                }
+                break;
+            case KEY_DOWN:
+                destaque++;
+                if (destaque >= numEscolhas) {
+                    destaque = 0;
+                }
+                break;
+            case 10:
+                escolha = destaque;
+                break;
+        }
+    }
+
+    return escolha;
+}
+
+int manterClientes() {
+
+    int tecla;
+    int escolha = -1;
+    int destaque = 0;
+    
+
+    char *escolhas[] = {
+        "1) Cadastrar Clientes",
+        "2) Consultar Clientes",
+        "3) Remover Clientes",
+        "4) Deletar Clientes"
+    };
+
+    int numOpcoes = sizeof(escolhas) / sizeof(char*);
+    clear();
+
+    
+
+    while (escolha == -1) {
+        clear();
+
+        mvprintw(0, 0,"===== MANTER CLIENTES =====\n\n");
+
+        for (int i = 0; i < numOpcoes; i++) {
+            int y = 5 + i;  // Imprimir na tela com separação
+            int x = 5;
+
+            if (i == destaque) {
+                attron(A_REVERSE);
+            }
+
+            mvprintw(y, x, "%s",
+                     escolhas[i]);
+            attroff(A_REVERSE);
+        }
+
+        refresh();
+
+        tecla = getch();
+
+        switch (tecla) {
+            case KEY_UP:
+            destaque--;
+            if (destaque < 0) {
+                destaque = numOpcoes - 1;
+            }
+            break;
+            case KEY_DOWN:
+            destaque++;
+            if (destaque >= numOpcoes){
+                destaque = 0;
+            }
+            break;
+            case 10:
+            escolha = destaque;
+            break;
+        }
+    }
+
+    
+}
+int manterProdutos() {
+    int x;
+    clear();
+    printw("===== MANTER PRODUTOS =====\n\n");
+    printw("1) Cadastro de Produtos\n");
+    printw("2) Consultar Produtos\n");
+    printw("3) Remover Produtos\n");
+    printw("4) Listar Produtos\n");
+    printw("5) Voltar\n\n");
+    printw("Digite a opção escolhida: ");
+    scanw("%d", &x);
+    getch();
+    refresh();
+    return x;
+}
+int manterPedidos() {
+    int x;
+    clear();
+    printw("===== MANTER PEDIDOS =====\n\n");
+    printw("1) Cadastro de Pedidos\n");
+    printw("2) Consultar Pedidos\n");
+    printw("3) Remover Pedidos\n");
+    printw("4) Listar Pedidos\n");
+    printw("5) Atualizar Pedido\n");
+    printw("6) Voltar\n\n");
+    printw("Digite a opção escolhida: ");
+    scanw("%d", &x);
+    getch();
+    refresh();
+    return x;
+}
+
+int main() {
+    FILE* fpClientes = fopen("clientes.csv", "a+");
+    FILE* fpProdutos = fopen("produtos.csv", "a+");
+    FILE* fpPedidos = fopen("pedidos.csv", "a+");
+
+    if (fpClientes == NULL || fpProdutos == NULL || fpPedidos == NULL) {
+        printf(
+            "Erro fatal: Não foi possível abrir os arquivos .csv "
+            "necessários.\n");
+        return EXIT_FAILURE;
+    }
+
+    initscr();
+    start_color();
+    clear();
+    noecho();
+    curs_set(0);
+    keypad(stdscr, TRUE);
+
+    init_pair(1, COLOR_YELLOW, COLOR_BLACK);
+    init_pair(2, COLOR_BLUE, COLOR_BLACK);
+    bkgd(COLOR_PAIR(2));
+
+    int escolhaMenu;
+
+    do {
+        escolhaMenu = menuInicial();
+
+        switch (escolhaMenu) {
+            case 0: {
+                int clienteValor;
+                do {
+                    clienteValor = manterClientes();
+                    switch (clienteValor) {
+                        case 0:
+                            cadastrarClientes(fpClientes);
+                            break;
+                        case 1:
+                            consultarClientes(fpClientes);
+                            break;
+                        case 2:
+                            fpClientes = deletarClientes(fpClientes);
+                            break;
+                        case 3:
+                            listarClientes(fpClientes);
+                            break;
+                        case 4:
+                            break;
+                        default:
+                            printw("Opção Inválida!");
+                            refresh();
+                            getch();
+                            break;
+                    }
+                } while (clienteValor != 5);
+                break;
+            }
+            case 1:
+                int produtoValor;
+                do {
+                    produtoValor = manterProdutos();
+                    switch (produtoValor) {
+                        case 1:
+                            cadastrarProdutos(fpProdutos);
+                            break;
+                        case 2:
+                            consultarProdutos(fpProdutos);
+                            break;
+                        case 3:
+                            deletarProdutos(fpProdutos);
+                            fpProdutos = fopen(ARQUIVO_PRODUTOS, "a+");
+                            if (fpProdutos == NULL) {
+                                printf(
+                                    "ERRO CRÍTICO: Não foi possível reabrir o "
+                                    "arquivo após a deleção.\n");
+                                exit(1);
+                            }
+                            break;
+                        case 4:
+                            listarProdutos(fpProdutos);
+                            break;
+                        case 5:
+                            break;
+                        default:
+                            printw(
+                                "Código inválido! Tente novamente um código "
+                                "válido.");
+                            refresh();
+                            getch();
+                            break;
+                    }
+
+                } while (produtoValor != 5);
+                break;
+            case 2:
+                int pedidoValor;
+                do {
+                    pedidoValor = manterPedidos();
+                    switch (pedidoValor) {
+                        case 1:
+                            cadastrarPedido(fpPedidos, fpClientes, fpProdutos);
+                            break;
+                        case 2:
+                            consultarPedido(fpPedidos, fpClientes);
+                            break;
+                        case 3:
+                            deletarPedido(fpPedidos, fpClientes);
+                            break;
+                        case 4:
+                            listarPedidos(fpPedidos);
+                            break;
+                        case 5:
+                            atualizarPedido(fpPedidos, fpClientes, fpProdutos);
+                            break;
+                        case 6:
+                            break;
+                        default:
+                            printw(
+                                "Código Inválido! Tente novamente um código "
+                                "válido.");
+                            refresh();
+                            getch();
+                            break;
+                    }
+
+                } while (pedidoValor != 6);
+                break;
+            case 3:
+                clear();
+                mvprintw(10, 5, "Saindo do programa...\n");
+                refresh();
+                break;
+        }
+
+    } while (escolhaMenu != 3);
+
+    printw("\nPressione qualquer tecla para sair...");
+    getch();
+
+    refresh();
+    sair(fpClientes, fpProdutos, fpPedidos);
+    return EXIT_SUCCESS;
+}
