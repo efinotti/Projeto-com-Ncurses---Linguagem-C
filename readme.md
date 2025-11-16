@@ -22,7 +22,19 @@ O sistema foi projetado de forma modular, dividido em três pilares principais:
 
 2. Módulo de Produtos (Planejado) A estrutura de dados para produtos já está definida (struct Produtos), prevendo o controle de estoque, descrição e preço. O próximo passo é implementar as funções CRUD para produtos.csv.
 
-3. Módulo de Pedidos (Planejado) A modelagem de dados (struct Pedidos e struct ItemPedidos) está pronta, estabelecendo a lógica relacional onde um pedido pode conter múltiplos itens. O objetivo futuro é criar a lógica para vincular clientes a produtos, gerando um novo pedido em pedidos.csv.
+3. Módulo de Pedidos (Planejado) Este módulo é o coração do sistema, gerenciando a relação de vendas entre clientes e produtos, ele utiliza uma lógica robusta de arquivo para garantir a integridade dos dados:
+
+    - Validação de Existência: Garante que o Cliente e o Produto referenciados no pedido existam nos seus respectivos módulos antes do registro.
+
+    - Geração de Data: Atribui automaticamente a data atual ao pedido no momento do cadastro.
+
+    - Manutenção de Arquivo Seguro:
+
+      Atualização (Update): Utiliza a lógica de arquivo temporário (ler, modificar, reescrever no temporário e renomear) para garantir uma atualização segura e atômica.
+
+      Remoção (Delete): Deleta pedidos de forma segura usando o mesmo método de arquivo temporário e renomeação.
+
+    - Status de Pedido: Permite rastrear o estado do pedido (ex: Pendente, Enviado, Cancelado).
 
 ## 📋 Pré-requisitos
 
