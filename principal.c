@@ -9,21 +9,6 @@
 
 WINDOW* janelaPrincipal;
 
-typedef struct {
-    int identificadorProduto;
-    int identificadorPedido;
-    int quantidade;
-    double precoSubtotal;
-} ItemPedidos;
-
-typedef struct {
-    int identificadorAutoral;
-    int identificadorCliente;
-    int itens;
-    char data[maxData];
-    double precoTotal;
-} Pedidos;
-
 int sair(FILE* fpC, FILE* fpP, FILE* fpPe) {
     fclose(fpC);
     fclose(fpP);
@@ -112,7 +97,8 @@ int manterClientes() {
         "1) Cadastrar Clientes",
         "2) Consultar Clientes",
         "3) Remover Clientes",
-        "4) Deletar Clientes"
+        "4) Listar Clientes",
+        "5) Voltar"
     };
 
     int numOpcoes = sizeof(escolhas) / sizeof(char*);
@@ -158,7 +144,7 @@ int manterClientes() {
         }
     }
 
-    
+    return escolha + 1;
 }
 int manterProdutos() {
     int x;
@@ -176,20 +162,63 @@ int manterProdutos() {
     return x;
 }
 int manterPedidos() {
-    int x;
-    clear();
-    printw("===== MANTER PEDIDOS =====\n\n");
-    printw("1) Cadastro de Pedidos\n");
-    printw("2) Consultar Pedidos\n");
-    printw("3) Remover Pedidos\n");
-    printw("4) Listar Pedidos\n");
-    printw("5) Atualizar Pedido\n");
-    printw("6) Voltar\n\n");
-    printw("Digite a opção escolhida: ");
-    scanw("%d", &x);
-    getch();
-    refresh();
-    return x;
+    int tecla;
+    int escolha = -1;
+    int destaque = 0;
+
+char *escolhas[] = {
+        "1) Cadastrar Pedido",
+        "2) Consultar Pedidos",
+        "3) Atualizar Pedido", 
+        "4) Remover Pedidos",  
+        "5) Listar Pedidos",   
+        "6) Voltar"
+    };
+
+    int numOpcoes = sizeof(escolhas) / sizeof(char*);
+
+    while (escolha == -1) {
+        clear();
+
+        mvprintw(0, 0,"===== MANTER PEDIDOS =====\n\n");
+        mvprintw(2, 5, "Use as setas para navegar. Pressione ENTER para selecionar.");
+
+        for (int i = 0; i < numOpcoes; i++) {
+            int y = 5 + i; 
+            int x = 5;
+
+            if (i == destaque) {
+                attron(A_REVERSE);
+            }
+
+            mvprintw(y, x, "%s", escolhas[i]);
+            attroff(A_REVERSE);
+        }
+
+        refresh();
+
+        tecla = getch();
+
+        switch (tecla) {
+            case KEY_UP:
+            destaque--;
+            if (destaque < 0) {
+                destaque = numOpcoes - 1;
+            }
+            break;
+            case KEY_DOWN:
+            destaque++;
+            if (destaque >= numOpcoes){
+                destaque = 0;
+            }
+            break;
+            case 10:
+            escolha = destaque;
+            break;
+        }
+    }
+
+    return escolha + 1; 
 }
 
 int main() {
@@ -226,19 +255,19 @@ int main() {
                 do {
                     clienteValor = manterClientes();
                     switch (clienteValor) {
-                        case 0:
+                        case 1:
                             cadastrarClientes(fpClientes);
                             break;
-                        case 1:
+                        case 2:
                             consultarClientes(fpClientes);
                             break;
-                        case 2:
+                        case 3:
                             fpClientes = deletarClientes(fpClientes);
                             break;
-                        case 3:
+                        case 4:
                             listarClientes(fpClientes);
                             break;
-                        case 4:
+                        case 5:
                             break;
                         default:
                             printw("Opção Inválida!");
@@ -298,13 +327,19 @@ int main() {
                             consultarPedido(fpPedidos, fpClientes);
                             break;
                         case 3:
-                            deletarPedido(fpPedidos, fpClientes);
+                            atualizarPedido(fpPedidos, fpClientes, fpProdutos);
+                            fclose(fpPedidos);
+                            fpPedidos = fopen("pedidos.csv", "a+");
+                            if (fpPedidos == NULL) {
+                                printw("ERRO CRÍTICO: Nao foi possivel reabrir o arquivo de pedidos apos atualizacao.");
+                                exit(1);
+                            }
                             break;
                         case 4:
-                            listarPedidos(fpPedidos);
+                            fpPedidos = deletarPedido(fpPedidos, fpClientes);
                             break;
                         case 5:
-                            atualizarPedido(fpPedidos, fpClientes, fpProdutos);
+                            listarPedidos(fpPedidos);
                             break;
                         case 6:
                             break;
@@ -323,6 +358,11 @@ int main() {
                 clear();
                 mvprintw(10, 5, "Saindo do programa...\n");
                 refresh();
+                break;
+            default:
+                printw("Opção inválida!\n");
+                refresh();
+                getch();
                 break;
         }
 
