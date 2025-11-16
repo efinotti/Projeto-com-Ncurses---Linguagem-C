@@ -324,8 +324,8 @@ int atualizarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
     fclose(fpPe);
     fclose(fpTemp);
 
-    remove(fpPe);
-    rename("pedidos_temp.csv", fpPe);
+    remove(ARQUIVO_PEDIDOS);
+    rename("pedidos_temp.csv",ARQUIVO_PEDIDOS);
     
     printw("\nAlteração feita com sucesso!\n");
     getch();
@@ -403,10 +403,10 @@ FILE* deletarPedido(FILE *fpPe, FILE *fpC){
     fclose(fpPe);
     fclose(fpTemp);
 
-    remove(fpPe);
-    rename("pedidos_temp.csv", fpPe);
+    remove(ARQUIVO_PEDIDOS);
+    rename("pedidos_temp.csv",ARQUIVO_PEDIDOS);
 
-    fpPe = fopen(fpPe, "a+");
+    fpPe = fopen(ARQUIVO_PEDIDOS, "a+");
     if (fpPe == NULL) {
          printw("\nERRO CRÍTICO: Nao foi possivel reabrir o arquivo de pedidos.\n");
          exit(1); 

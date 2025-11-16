@@ -15,6 +15,8 @@
 #include "../cliente/cliente.h"
 #include "../produto/Produtos.h"
 
+#define ARQUIVO_PEDIDOS "pedidos.csv"
+
 typedef struct {
     int codigoPedido;
     int codigoCliente;
