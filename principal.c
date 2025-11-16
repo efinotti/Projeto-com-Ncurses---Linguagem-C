@@ -139,11 +139,14 @@ int manterClientes() {
             }
             break;
             case 10:
+            case '\r':
+            case KEY_ENTER:
             escolha = destaque;
             break;
         }
     }
 
+    flushinp();
     return escolha + 1;
 }
 int manterProdutos() {
@@ -181,7 +184,7 @@ char *escolhas[] = {
         clear();
 
         mvprintw(0, 0,"===== MANTER PEDIDOS =====\n\n");
-        mvprintw(2, 5, "Use as setas para navegar. Pressione ENTER para selecionar.");
+        mvprintw(2, 5, "Use as setas para navegar. Pressione ENTER para selecionar.\n");
 
         for (int i = 0; i < numOpcoes; i++) {
             int y = 5 + i; 
@@ -213,11 +216,14 @@ char *escolhas[] = {
             }
             break;
             case 10:
+            case '\r':
+            case KEY_ENTER:
             escolha = destaque;
             break;
         }
     }
 
+    flushinp();
     return escolha + 1; 
 }
 
