@@ -26,7 +26,7 @@ typedef struct {
 typedef struct {
     int identificador;
     char nome[maxNome];
-    int telefone;
+    float telefone;
     char email[maxEmail];
     Endereco endereco;
     char cpf[tamCPF];
@@ -40,6 +40,6 @@ int codigoClienteJaExiste(FILE* fp, int code);
 void cadastrarClientes(FILE* fp);
 void consultarClientes(FILE* fp);
 FILE* deletarClientes(FILE* fp);
-void listarClientes(FILE* fp);
+int listarClientes(FILE* fp);
 
 #endif
