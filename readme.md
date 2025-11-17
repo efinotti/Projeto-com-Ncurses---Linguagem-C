@@ -49,7 +49,7 @@ Para compilar e executar este projeto, você precisará ter:
 Para compilar o código, utilize o seguinte comando no seu terminal:
 Bash
 
-```gcc principal.c cliente/cliente.c -o principal -lncurses```
+```gcc principal.c cliente/cliente.c produto/Produtos.c pedido/pedido.c -o principal -lncurses```
 
 ## ▶️ Execução
 
