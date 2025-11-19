@@ -46,8 +46,8 @@ int codigoPedidoJaExiste(FILE* fpPe, int code){
     double valorTotal;
     char status[maxStatus];
 
-   while(fscanf(fpPe, "%d,%d,%d,%d,%[^,],%[^,],%lf,%[^\n]%*c",
-        &codigoPedido, &codigoCliente, &codigoProduto, &quantidade, data, descricao, &valorTotal, status) == 8){
+   while(fscanf(fpPe, "%d,%d,%d,%d,%[^,],%[^,],%lf,%[^\n]%*c",&codigoPedido, &codigoCliente, &codigoProduto, &quantidade, data,
+        descricao, &valorTotal, status) == 8){
         if(codigoPedido == code && codigoPedido != 0){ 
             return 1;
         }
@@ -143,10 +143,8 @@ void listarPedidos(FILE *fpPe){
     
     printw("\n\n=====LISTA DE PEDIDOS=====\n\n");
     
-    while(fscanf(fpPe, "%d,%d,%d,%d,%[^,],%[^,],%lf,%[^\n]%*c",
-                 &pedido.codigoPedido,&pedido.codigoCliente,&pedido.codigoProduto,&pedido.quantidade,
-                 pedido.data,pedido.descricao,&pedido.valorTotal,pedido.status) == 8){
-                     
+    while(fscanf(fpPe, "%d,%d,%d,%d,%[^,],%[^,],%lf,%[^\n]%*c",&pedido.codigoPedido,&pedido.codigoCliente,&pedido.codigoProduto,
+        &pedido.quantidade,pedido.data,pedido.descricao,&pedido.valorTotal,pedido.status) == 8){       
         if(pedido.codigoPedido != 0){
             printw("Código do Pedido: %d | Cliente: %d | Produto: %d | Descrição: %s | Quantidade: %d | Valor: %.2f | Data: %s | Status: %s\n",
                     pedido.codigoPedido,pedido.codigoCliente,pedido.codigoProduto,pedido.descricao,pedido.quantidade,pedido.valorTotal,
@@ -183,10 +181,8 @@ int consultarPedido(FILE *fpPe, FILE *fpC){
     PedidoMenu *pedidosDoCliente = NULL;
     int totalPedidosCliente = 0;
     
-    while(fscanf(fpPe, "%d,%d,%d,%d,%[^,],%[^,],%lf,%[^\n]%*c",
-                 &pedido.codigoPedido, &pedido.codigoCliente, &pedido.codigoProduto, &pedido.quantidade,
-                 pedido.data, pedido.descricao, &pedido.valorTotal, pedido.status) == 8){
-        
+    while(fscanf(fpPe, "%d,%d,%d,%d,%[^,],%[^,],%lf,%[^\n]%*c",&pedido.codigoPedido, &pedido.codigoCliente, &pedido.codigoProduto,
+        &pedido.quantidade,pedido.data, pedido.descricao, &pedido.valorTotal, pedido.status) == 8){
         if(pedido.codigoCliente == codigoCliente && pedido.codigoPedido != 0){
             totalPedidosCliente++;
         }
@@ -208,10 +204,8 @@ int consultarPedido(FILE *fpPe, FILE *fpC){
 
     rewind(fpPe);
     int i = 0;
-    while(fscanf(fpPe, "%d,%d,%d,%d,%[^,],%[^,],%lf,%[^\n]%*c",
-                 &pedido.codigoPedido, &pedido.codigoCliente, &pedido.codigoProduto, &pedido.quantidade,
-                 pedido.data, pedido.descricao, &pedido.valorTotal, pedido.status) == 8){
-        
+    while(fscanf(fpPe, "%d,%d,%d,%d,%[^,],%[^,],%lf,%[^\n]%*c",&pedido.codigoPedido, &pedido.codigoCliente, &pedido.codigoProduto,
+        &pedido.quantidade,pedido.data, pedido.descricao, &pedido.valorTotal, pedido.status) == 8){
         if(pedido.codigoCliente == codigoCliente && pedido.codigoPedido != 0){
             pedidosDoCliente[i].codigoPedido = pedido.codigoPedido;
             pedidosDoCliente[i].codigoCliente = pedido.codigoCliente;
@@ -266,10 +260,8 @@ int consultarPedido(FILE *fpPe, FILE *fpC){
     
     rewind(fpPe);
     
-    while(fscanf(fpPe, "%d,%d,%d,%d,%10[^,],%99[^,],%lf,%19[^\n]%*c",
-                 &pedido.codigoPedido, &pedido.codigoCliente, &pedido.codigoProduto, &pedido.quantidade,
-                 pedido.data, pedido.descricao, &pedido.valorTotal, pedido.status) == 8){
-    
+    while(fscanf(fpPe, "%d,%d,%d,%d,%10[^,],%99[^,],%lf,%19[^\n]%*c",&pedido.codigoPedido, &pedido.codigoCliente, &pedido.codigoProduto,
+        &pedido.quantidade,pedido.data, pedido.descricao, &pedido.valorTotal, pedido.status) == 8){
         if(pedido.codigoPedido == codigoPedidoSelecionado){
             printw("\n=====DETALHES DO PEDIDO %d=====\n", pedido.codigoPedido);
             printw("Cliente: %d\nProduto: %d\nQuantidade: %d\nData: %s\nStatus: %s\nValor: %.2f\nDescrição: %s\n",
@@ -309,10 +301,8 @@ int atualizarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
 
     rewind(fpPe);
 
-    while(fscanf(fpPe, "%d,%d,%d,%d,%[^,],%[^,],%lf,%[^\n]%*c",
-                 &pedido.codigoPedido, &pedido.codigoCliente, &pedido.codigoProduto, &pedido.quantidade,
-                 pedido.data, pedido.descricao, &pedido.valorTotal, pedido.status) == 8){
-        
+    while(fscanf(fpPe, "%d,%d,%d,%d,%[^,],%[^,],%lf,%[^\n]%*c",&pedido.codigoPedido, &pedido.codigoCliente, &pedido.codigoProduto,
+        &pedido.quantidade, pedido.data, pedido.descricao, &pedido.valorTotal, pedido.status) == 8){
         if(pedido.codigoCliente == codigoCliente && pedido.codigoPedido != 0){
             totalPedidosCliente++;
         }
@@ -325,6 +315,7 @@ int atualizarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
     }
     
     pedidosDoCliente = (PedidoMenu*)malloc(totalPedidosCliente * sizeof(PedidoMenu));
+
     if (pedidosDoCliente == NULL) {
         mvprintw(5, 5, "Erro fatal: Falha ao alocar memória!");
         getch();
@@ -333,10 +324,8 @@ int atualizarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
 
     rewind(fpPe);
     int i = 0;
-    while(fscanf(fpPe, "%d,%d,%d,%d,%[^,],%[^,],%lf,%[^\n]%*c",
-                 &pedido.codigoPedido, &pedido.codigoCliente, &pedido.codigoProduto, &pedido.quantidade,
-                 pedido.data, pedido.descricao, &pedido.valorTotal, pedido.status) == 8){
-        
+    while(fscanf(fpPe, "%d,%d,%d,%d,%[^,],%[^,],%lf,%[^\n]%*c",&pedido.codigoPedido, &pedido.codigoCliente, &pedido.codigoProduto,
+        &pedido.quantidade,pedido.data, pedido.descricao, &pedido.valorTotal, pedido.status) == 8){
         if(pedido.codigoCliente == codigoCliente && pedido.codigoPedido != 0){
             pedidosDoCliente[i].codigoPedido = pedido.codigoPedido;
             pedidosDoCliente[i].codigoCliente = pedido.codigoCliente;
@@ -362,8 +351,8 @@ int atualizarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
                 attron(A_REVERSE);
             }
 
-            mvprintw(y, x, "Cód: %d | Desc: %s | Qtd: %d",
-                     pedidosDoCliente[j].codigoPedido, pedidosDoCliente[j].descricao, pedidosDoCliente[j].quantidade);
+            mvprintw(y, x, "Cód: %d | Desc: %s | Qtd: %d",pedidosDoCliente[j].codigoPedido, pedidosDoCliente[j].descricao,
+                pedidosDoCliente[j].quantidade);
             
             attroff(A_REVERSE);
         }
@@ -388,10 +377,8 @@ int atualizarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
     rewind(fpPe);
     int pedidoEncontrado = 0;
 
-    while(fscanf(fpPe, "%d,%d,%d,%d,%[^,],%[^,],%lf,%[^\n]%*c",
-                 &pedido.codigoPedido,&pedido.codigoCliente,&pedido.codigoProduto,&pedido.quantidade,
-                 pedido.data,pedido.descricao,&pedido.valorTotal,pedido.status) == 8){
-        
+    while(fscanf(fpPe, "%d,%d,%d,%d,%[^,],%[^,],%lf,%[^\n]%*c",&pedido.codigoPedido,&pedido.codigoCliente,&pedido.codigoProduto,
+        &pedido.quantidade,pedido.data,pedido.descricao,&pedido.valorTotal,pedido.status) == 8){
         if (pedido.codigoPedido == opc && pedido.codigoCliente == codigoCliente) {
             pedidoModificado = pedido;
             pedidoEncontrado = 1;
@@ -501,7 +488,6 @@ int atualizarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
     while(fscanf(fpPe, "%d,%d,%d,%d,%[^,],%[^,],%lf,%[^\n]%*c",
                  &pedido.codigoPedido,&pedido.codigoCliente,&pedido.codigoProduto,&pedido.quantidade,
                  pedido.data,pedido.descricao,&pedido.valorTotal,pedido.status) == 8){
-        
         if (pedido.codigoPedido == opc) {
             fprintf(fpTemp, "%d,%d,%d,%d,%s,%s,%.2f,%s\n", 
                      pedidoModificado.codigoPedido, pedidoModificado.codigoCliente, 
@@ -533,7 +519,6 @@ int atualizarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
         mvprintw(0, 0, "ERRO: Falha ao finalizar a atualização do arquivo.");
         getch();
     }
-
     if (pedidosDoCliente != NULL) free(pedidosDoCliente);
     return resultado;
 }
@@ -563,14 +548,12 @@ FILE* deletarPedido(FILE *fpPe, FILE *fpC){
     while(fscanf(fpPe, "%d,%d,%d,%d,%[^,],%[^,],%lf,%[^\n]%*c",
                  &pedido.codigoPedido,&pedido.codigoCliente,&pedido.codigoProduto,&pedido.quantidade,
                  pedido.data,pedido.descricao,&pedido.valorTotal,pedido.status) == 8){
-        
         if(pedido.codigoCliente == codigoCliente && pedido.codigoPedido != 0){
             printw("\nCódigo do Pedido: %d | Descrição: %s | Quantidade: %d\n",
                      pedido.codigoPedido,pedido.descricao,pedido.quantidade);
             encontro = 1;
         }
     }
-    
     if(encontro == 0){
         printw("\nErro: Nenhum Pedido Encontrado!\n");
         getch();
@@ -595,7 +578,6 @@ FILE* deletarPedido(FILE *fpPe, FILE *fpC){
     while(fscanf(fpPe, "%d,%d,%d,%d,%[^,],%[^,],%lf,%[^\n]%*c",
                  &pedido.codigoPedido,&pedido.codigoCliente,&pedido.codigoProduto,&pedido.quantidade,
                  pedido.data,pedido.descricao,&pedido.valorTotal,pedido.status) == 8){
-
         if (pedido.codigoPedido != opc) {
             fprintf(fpTemp, "%d,%d,%d,%d,%s,%s,%.2f,%s\n", 
                     pedido.codigoPedido, pedido.codigoCliente, 
@@ -617,7 +599,6 @@ FILE* deletarPedido(FILE *fpPe, FILE *fpC){
          printw("\nERRO CRÍTICO: Nao foi possivel reabrir o arquivo de pedidos.\n");
          exit(1); 
     }
-
     if (pedidoDeletado) {
         printw("\nO pedido %d foi desfeito com sucesso!\n", opc);
     } else {
