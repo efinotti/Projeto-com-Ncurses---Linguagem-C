@@ -6,8 +6,6 @@
 #define maxStatus 20
 #define maxDescricao 100
 #define maxPedidos 100
-#define vdd 1
-#define falso 0
 #define maxLinhas 200
 
 #include <ncurses.h>

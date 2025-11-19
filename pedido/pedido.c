@@ -386,7 +386,7 @@ int atualizarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
     
     clear();
     rewind(fpPe);
-    int pedidoEncontrado = falso;
+    int pedidoEncontrado = 0;
 
     while(fscanf(fpPe, "%d,%d,%d,%d,%[^,],%[^,],%lf,%[^\n]%*c",
                  &pedido.codigoPedido,&pedido.codigoCliente,&pedido.codigoProduto,&pedido.quantidade,
@@ -394,7 +394,7 @@ int atualizarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
         
         if (pedido.codigoPedido == opc && pedido.codigoCliente == codigoCliente) {
             pedidoModificado = pedido;
-            pedidoEncontrado = vdd;
+            pedidoEncontrado = 1;
             break;
         }
     }
