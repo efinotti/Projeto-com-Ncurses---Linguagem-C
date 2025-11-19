@@ -6,6 +6,9 @@
 #define maxStatus 20
 #define maxDescricao 100
 #define maxPedidos 100
+#define vdd 1
+#define falso 0
+#define maxLinhas 200
 
 #include <ncurses.h>
 #include <stdio.h>
@@ -24,9 +27,16 @@ typedef struct {
     int quantidade;
     char data[maxData];
     char descricao[maxDescricao];
-    float valorTotal;
+    double valorTotal;
     char status[maxStatus];
 }Pedido;
+
+typedef struct {
+    int codigoPedido;
+    int codigoCliente;
+    char descricao[maxDescricao];
+    int quantidade;
+} PedidoMenu;
 
 extern int totalPedidos;
 
@@ -37,5 +47,6 @@ int consultarPedido(FILE *fpPe, FILE *fpC);
 FILE* deletarPedido(FILE *fpPe, FILE *fpC);
 int atualizarPedido(FILE *fpPe,  FILE *fpC, FILE *fpP);
 void obterDataAtual(char *destino, int tamanho);
+void obterDadosProduto(FILE *fpP,int codigoProduto, char *descricaoDestino, double *precoDestino);
 
 #endif

@@ -334,7 +334,6 @@ int main() {
                             break;
                         case 3:
                             atualizarPedido(fpPedidos, fpClientes, fpProdutos);
-                            fclose(fpPedidos);
                             fpPedidos = fopen("pedidos.csv", "a+");
                             if (fpPedidos == NULL) {
                                 printw("ERRO CRÍTICO: Nao foi possivel reabrir o arquivo de pedidos apos atualizacao.");
