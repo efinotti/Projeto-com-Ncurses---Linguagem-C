@@ -28,13 +28,17 @@ O sistema foi projetado de forma modular, dividido em três pilares principais:
 
     - Geração de Data: Atribui automaticamente a data atual ao pedido no momento do cadastro.
 
+    - Calculo de Valor Total: Faz o cálculo automáticamente com base no valor unitário do Produto e a quantidade de itens, valor unitário pré-estabelecido no cadastro do Produto. 
+
+    - Busca de Dados: Obtém dados do Produto de forma automática após informar o código identificador do Produto para que seja feito o cadastro do Pedido.
+    
     - Manutenção de Arquivo Seguro:
 
       Atualização (Update): Utiliza a lógica de arquivo temporário (ler, modificar, reescrever no temporário e renomear) para garantir uma atualização segura e atômica.
 
       Remoção (Delete): Deleta pedidos de forma segura usando o mesmo método de arquivo temporário e renomeação.
 
-    - Status de Pedido: Permite rastrear o estado do pedido (ex: Pendente, Enviado, Cancelado).
+    - Status de Pedido: Atribuí Status de pedido automáticamente no momento do cadastro, podendo ser alterado posteriormente.
 
 ## 📋 Pré-requisitos
 
