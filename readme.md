@@ -26,7 +26,7 @@ O sistema foi projetado de forma modular, dividido em três pilares principais:
 
     - Validação de Existência: Garante que o Cliente e o Produto referenciados no pedido existam nos seus respectivos módulos antes do registro.
 
-    - Geração de Data: Atribui automaticamente a data atual ao pedido no momento do cadastro.
+    - Geração de Data: Atribui automaticamente a data atual ao pedido no momento do cadastro e após realizar alguma atualização do pedido.
 
     - Calculo de Valor Total: Faz o cálculo automáticamente com base no valor unitário do Produto e a quantidade de itens, valor unitário pré-estabelecido no cadastro do Produto. 
 
