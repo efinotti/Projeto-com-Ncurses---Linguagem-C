@@ -150,19 +150,65 @@ int manterClientes() {
     return escolha + 1;
 }
 int manterProdutos() {
-    int x;
-    clear();
-    printw("===== MANTER PRODUTOS =====\n\n");
-    printw("1) Cadastro de Produtos\n");
-    printw("2) Consultar Produtos\n");
-    printw("3) Remover Produtos\n");
-    printw("4) Listar Produtos\n");
-    printw("5) Voltar\n\n");
-    printw("Digite a opção escolhida: ");
-    scanw("%d", &x);
-    getch();
-    refresh();
-    return x;
+int tecla;
+    int escolha = -1;
+    int destaque = 0;
+
+char *escolhas[] = {
+        "1) Cadastrar Produto",
+        "2) Consultar Produto",
+        "3) Remover Produto",  
+        "4) Listar Produto",   
+        "5) Voltar"
+    };
+
+    int numOpcoes = sizeof(escolhas) / sizeof(char*);
+
+    while (escolha == -1) {
+        clear();
+
+        mvprintw(0, 0,"===== MANTER PRODUTOS =====\n\n");
+        mvprintw(2, 5, "Use as setas para navegar. Pressione ENTER para selecionar.\n");
+
+        for (int i = 0; i < numOpcoes; i++) {
+            int y = 5 + i; 
+            int x = 5;
+
+            if (i == destaque) {
+                attron(A_REVERSE);
+            }
+
+            mvprintw(y, x, "%s", escolhas[i]);
+            attroff(A_REVERSE);
+        }
+
+        refresh();
+
+        tecla = getch();
+
+        switch (tecla) {
+            case KEY_UP:
+            destaque--;
+            if (destaque < 0) {
+                destaque = numOpcoes - 1;
+            }
+            break;
+            case KEY_DOWN:
+            destaque++;
+            if (destaque >= numOpcoes){
+                destaque = 0;
+            }
+            break;
+            case 10:
+            case '\r':
+            case KEY_ENTER:
+            escolha = destaque;
+            break;
+        }
+    }
+
+    flushinp();
+    return escolha + 1; 
 }
 int manterPedidos() {
     int tecla;
