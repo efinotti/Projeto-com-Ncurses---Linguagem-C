@@ -7,8 +7,7 @@ void obterDataAtual(char *destino, int tamanho){
     time_t agora = time(NULL);
     struct tm *tm_info = localtime(&agora);
     
-    snprintf(destino, tamanho, "%02d/%02d/%04d",
-        tm_info->tm_mday, tm_info->tm_mon + 1, tm_info->tm_year + 1900);
+    snprintf(destino, tamanho, "%02d/%02d/%04d",tm_info->tm_mday, tm_info->tm_mon + 1, tm_info->tm_year + 1900);
 }
 
 void obterDadosProduto(FILE *fpP, int codigoProduto, char *descricaoDestino, double *precoDestino){
@@ -123,10 +122,8 @@ void cadastrarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
     mvprintw(12, 0, "Valor Unitário: R$ %.2f", precoUnitario);
     mvprintw(13, 0, "Valor Total: R$ %.2f", pedido.valorTotal);
     
-    fprintf(fpPe, "%d,%d,%d,%d,%s,%s,%.2f,%s\n", 
-            pedido.codigoPedido, pedido.codigoCliente,
-            pedido.codigoProduto, pedido.quantidade, 
-            pedido.data, pedido.descricao, pedido.valorTotal, pedido.status);
+    fprintf(fpPe, "%d,%d,%d,%d,%s,%s,%.2f,%s\n", pedido.codigoPedido, pedido.codigoCliente,pedido.codigoProduto, pedido.quantidade, 
+        pedido.data, pedido.descricao, pedido.valorTotal, pedido.status);
 
     fflush(fpPe);
 
@@ -195,6 +192,7 @@ int consultarPedido(FILE *fpPe, FILE *fpC){
     }
     
     pedidosDoCliente = (PedidoMenu*)malloc(totalPedidosCliente * sizeof(PedidoMenu));
+    
     if (pedidosDoCliente == NULL) {
         mvprintw(5, 5, "Erro fatal: Falha ao alocar memória!");
         refresh();
@@ -324,6 +322,7 @@ int atualizarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
 
     rewind(fpPe);
     int i = 0;
+    
     while(fscanf(fpPe, "%d,%d,%d,%d,%[^,],%[^,],%lf,%[^\n]%*c",&pedido.codigoPedido, &pedido.codigoCliente, &pedido.codigoProduto,
         &pedido.quantidade,pedido.data, pedido.descricao, &pedido.valorTotal, pedido.status) == 8){
         if(pedido.codigoCliente == codigoCliente && pedido.codigoPedido != 0){

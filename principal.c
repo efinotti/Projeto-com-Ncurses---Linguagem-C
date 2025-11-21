@@ -210,10 +210,15 @@ char *escolhas[] = {
     flushinp();
     return escolha + 1; 
 }
+
+/* ======MENU INTERATIVO DO MANTER PEDIDOS====== */
+
 int manterPedidos() {
     int tecla;
     int escolha = -1;
     int destaque = 0;
+
+/* ======LISTA DE OPÇÕES======*/
 
 char *escolhas[] = {
         "1) Cadastrar Pedido",
@@ -237,7 +242,7 @@ char *escolhas[] = {
             int x = 5;
 
             if (i == destaque) {
-                attron(A_REVERSE);
+                attron(A_REVERSE); /* Serve para inverter a cor do texto, pois irá ligar o destaque, isso "ao colocar" */
             }
 
             mvprintw(y, x, "%s", escolhas[i]);
@@ -251,13 +256,13 @@ char *escolhas[] = {
         switch (tecla) {
             case KEY_UP:
             destaque--;
-            if (destaque < 0) {
+            if (destaque < 0) { /* Se passar do início, volta para o fim */ 
                 destaque = numOpcoes - 1;
             }
             break;
             case KEY_DOWN:
             destaque++;
-            if (destaque >= numOpcoes){
+            if (destaque >= numOpcoes){ /* Se passar do fim, volta para o início */
                 destaque = 0;
             }
             break;

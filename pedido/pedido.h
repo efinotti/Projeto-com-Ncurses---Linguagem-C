@@ -1,12 +1,26 @@
 #ifndef PEDIDO_H
 #define PEDIDO_H
 
+/*
+    =======================
+    ===== DEFINIÇÕES ======
+    =======================
+
+*/
 
 #define maxData 11
 #define maxStatus 20
 #define maxDescricao 100
 #define maxPedidos 100
 #define maxLinhas 200
+#define ARQUIVO_PEDIDOS "pedidos.csv"
+
+/*
+    ========================
+    ===== BIBLIOTECAS ======
+    ========================
+
+*/
 
 #include <ncurses.h>
 #include <stdio.h>
@@ -16,7 +30,12 @@
 #include "../cliente/cliente.h"
 #include "../produto/Produtos.h"
 
-#define ARQUIVO_PEDIDOS "pedidos.csv"
+/*
+    ====================
+    ===== STRUCTS ======
+    ====================
+
+*/
 
 typedef struct {
     int codigoPedido;
@@ -36,7 +55,12 @@ typedef struct {
     int quantidade;
 } PedidoMenu;
 
-extern int totalPedidos;
+/*
+    ====================
+    ===== FUNÇÕES ======
+    ====================
+
+*/
 
 int codigoPedidoJaExiste(FILE * fpPe, int code);
 void cadastrarPedido(FILE *fpPe, FILE *fpC, FILE *fpP);
@@ -46,5 +70,7 @@ FILE* deletarPedido(FILE *fpPe, FILE *fpC);
 int atualizarPedido(FILE *fpPe,  FILE *fpC, FILE *fpP);
 void obterDataAtual(char *destino, int tamanho);
 void obterDadosProduto(FILE *fpP,int codigoProduto, char *descricaoDestino, double *precoDestino);
+
+extern int totalPedidos; /* VARIÁVEL EXTERNA AUXÍLIAR */
 
 #endif
