@@ -65,7 +65,9 @@ void cadastrarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
 
     mvprintw(3, 0, "Digite o código do pedido:\n");
     refresh();
+    echo();
     scanw("%d", &pedido.codigoPedido);
+    noecho();
     getch();
 
     if(pedido.codigoPedido == 0){ 
@@ -84,7 +86,9 @@ void cadastrarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
 
     mvprintw(5, 0, "Digite o código do cliente:\n");
     refresh();
+    echo();
     scanw("%d", &pedido.codigoCliente);
+    noecho();
     getch();
     
     if(!codigoClienteJaExiste(fpC, pedido.codigoCliente)){
@@ -96,7 +100,9 @@ void cadastrarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
 
     mvprintw(7, 0, "Digite o código do Produto:\n");
     refresh();
+    echo();
     scanw("%d", &pedido.codigoProduto);
+    noecho();
     getch();
     
     if(!codigoProdutoJaExiste(fpP, pedido.codigoProduto)){
@@ -108,7 +114,9 @@ void cadastrarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
 
     mvprintw(9, 0, "Digite a quantidade de itens:\n");
     refresh();
+    echo();
     scanw("%d", &pedido.quantidade);
+    noecho();
     getch();
 
     obterDadosProduto(fpP, pedido.codigoProduto, pedido.descricao, &precoUnitario);
@@ -528,9 +536,13 @@ FILE* deletarPedido(FILE *fpPe, FILE *fpC){
     int codigoCliente, opc, encontro = 0;
     Pedido pedido;
     
-    printw("\nInforme o código do Cliente:\n");
+    clear();
+    mvprintw(0, 0, "===== EXCLUIR PEDIDO =====");
+    mvprintw(3, 5, "Informe o código do Cliente dono do pedido:");
     fflush(stdout);
+    echo();
     scanw("%d", &codigoCliente);
+    noecho();
     getch();
     
     if(!codigoClienteJaExiste(fpC,codigoCliente)){
@@ -561,7 +573,9 @@ FILE* deletarPedido(FILE *fpPe, FILE *fpC){
     
     printw("\nInforme o código do pedido que você deseja desfazer:\n");
     fflush(stdout);
+    echo();
     scanw("%d", &opc);
+    noecho();
     getch();
 
     FILE *fpTemp = fopen("pedidos_temp.csv", "w"); 

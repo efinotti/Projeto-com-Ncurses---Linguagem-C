@@ -218,7 +218,7 @@ int manterPedidos() {
     int escolha = -1;
     int destaque = 0;
 
-/* ======LISTA DE OPÇÕES======*/
+/* ======LISTA DE OPÇÕES====== */
 
 char *escolhas[] = {
         "1) Cadastrar Pedido",
@@ -242,11 +242,11 @@ char *escolhas[] = {
             int x = 5;
 
             if (i == destaque) {
-                attron(A_REVERSE); /* Serve para inverter a cor do texto, pois irá ligar o destaque, isso "ao colocar" */
+                attron(A_REVERSE); /* Serve para inverter a cor do texto, pois irá ligar o destaque, isso "ao colocar" a setinha em cima */
             }
 
             mvprintw(y, x, "%s", escolhas[i]);
-            attroff(A_REVERSE);
+            attroff(A_REVERSE); /* Serve para invertar a cor do texto, pois irá ligar o destaque */
         }
 
         refresh();
@@ -266,16 +266,21 @@ char *escolhas[] = {
                 destaque = 0;
             }
             break;
-            case 10:
-            case '\r':
-            case KEY_ENTER:
+
+            /* Opções de "Enters" para cada tipo de sistema */
+
+            case 10: /* Linux */
+            case '\r': /* Windows */
+            case KEY_ENTER: /* Ncurses */
             escolha = destaque;
             break;
         }
     }
 
-    flushinp();
-    return escolha + 1; 
+    flushinp(); /* Serve para limpar o buffer do teclado, pois assim evitar ENTER duplo,
+                tava dando erro de alocação de memória em alguns testes que fiz */ 
+
+    return escolha + 1; /* Retorna a escolha, no caso 1 a 6 e não 0 a 5 */ 
 }
 
 int main() {
