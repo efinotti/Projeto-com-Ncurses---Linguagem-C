@@ -136,6 +136,13 @@ void cadastrarClientes(FILE* fp) {
 
                 refresh();
 
+                if (codigo <= 0) {
+                    mvprintw(10, 5, "=== CODIGO NAO E VALIDO ===");
+                    refresh();
+                    getchar();
+                    break;
+                }
+
                 int verdadeiro = codigoClienteJaExiste(fp, codigo);
 
                 if (verdadeiro) {
