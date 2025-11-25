@@ -22,7 +22,23 @@ O sistema foi projetado de forma modular, dividido em três pilares principais:
 
 2. Módulo de Produtos (Planejado) A estrutura de dados para produtos já está definida (struct Produtos), prevendo o controle de estoque, descrição e preço. O próximo passo é implementar as funções CRUD para produtos.csv.
 
-3. Módulo de Pedidos (Planejado) A modelagem de dados (struct Pedidos e struct ItemPedidos) está pronta, estabelecendo a lógica relacional onde um pedido pode conter múltiplos itens. O objetivo futuro é criar a lógica para vincular clientes a produtos, gerando um novo pedido em pedidos.csv.
+3. Módulo de Pedidos (Implementado) Este módulo é o coração do sistema, gerenciando a relação de vendas entre clientes e produtos, ele utiliza uma lógica robusta de arquivo para garantir a integridade dos dados:
+
+    - Validação de Existência: Garante que o Cliente e o Produto referenciados no pedido existam nos seus respectivos módulos antes do registro.
+
+    - Geração de Data: Atribui automaticamente a data atual ao pedido no momento do cadastro e após realizar alguma atualização do pedido.
+
+    - Calculo de Valor Total: Faz o cálculo automáticamente com base no valor unitário do Produto e a quantidade de itens, valor unitário pré-estabelecido no cadastro do Produto. 
+
+    - Busca de Dados: Obtém dados do Produto de forma automática após informar o código identificador do Produto para que seja feito o cadastro do Pedido.
+    
+    - Manutenção de Arquivo Seguro:
+
+      Atualização (Update): Utiliza a lógica de arquivo temporário (ler, modificar, reescrever no temporário e renomear) para garantir uma atualização segura e atômica.
+
+      Remoção (Delete): Deleta pedidos de forma segura usando o mesmo método de arquivo temporário e renomeação.
+
+    - Status de Pedido: Atribuí Status de pedido automáticamente no momento do cadastro, podendo ser alterado posteriormente.
 
 ## 📋 Pré-requisitos
 
@@ -37,7 +53,7 @@ Para compilar e executar este projeto, você precisará ter:
 Para compilar o código, utilize o seguinte comando no seu terminal:
 Bash
 
-```gcc principal.c cliente/cliente.c -o principal -lncurses```
+```gcc principal.c cliente/cliente.c produto/Produtos.c pedido/pedido.c -o principal -lncurses```
 
 ## ▶️ Execução
 

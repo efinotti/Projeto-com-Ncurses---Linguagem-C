@@ -151,7 +151,7 @@ void cadastrarClientes(FILE* fp) {
 
                     mvprintw(0, 0, "===== CADASTRO DE CPF =====");
                     mvprintw(5, 5, "Digite o CPF (somente 11 números): ");
-                    getnstr(cpf, 11);
+                    getnstr(cpf, 12);
                     noecho();
                     validadeCPF = validaCPF(cpf);
 
@@ -233,220 +233,106 @@ void cadastrarClientes(FILE* fp) {
 
             } while (validade != 1);
             break;
-    }
+        case 1:
+            int validade01;
 
-    /** x
-
-    switch (escolha) {
-        case 1: {
-            int validade = 0;
             do {
-                int code;
                 clear();
-                printw("===== Cadastro de Cliente (PF) =====\n\n");
+                echo();
 
-                printw("Digite o código identificador: ");
-                scanw("%d", &code);
-                getch();
+                int codigo;
+
+                mvprintw(0, 0, "===== Cadastro de Cliente (PJ) =====\n\n");
+                mvprintw(5, 5, "Digite o código identificador: ");
+                scanw("%d", &codigo);
+
                 refresh();
 
-                int verdadeiro = codigoClienteJaExiste(fp, code);
+                int verdadeiro = codigoClienteJaExiste(fp, codigo);
 
                 if (verdadeiro) {
                     clear();
-                    printw("ERRO: Código de cliente já cadastrado!\n");
+                    mvprintw(0, 0, "ERRO: Código de cliente já cadastrado!");
                     refresh();
                     getch();
                 } else {
-                    int validadeCPF;
-                    char cpf[tamCPF];
-
                     clear();
-                    printw("===== CADASTRO DE CPF =====\n\n");
-                    printw("Digite o CPF (somente 11 números): ");
-                    echo();
-                    getnstr(cpf, 11);
-                    noecho();
-                    validadeCPF = validaCPF(cpf);
 
-                    if (validadeCPF) {
-                        printw("\nCPF válido!\n");
+                    int validadeCNPJ;
+                    char cnpj[tamCNPJ];
+
+                    mvprintw(0, 0, "===== CADASTRO DE CNPJ =====");
+                    mvprintw(5, 5, "Digite o CNPJ: ");
+                    getnstr(cnpj, 15);
+                    noecho();
+                    validadeCNPJ = validaCNPJ(cnpj);
+
+                    if (validadeCNPJ) {
+                        mvprintw(0, 0, "\nCNPJ válido!\n");
                         refresh();
 
                         Cliente cliente;
-                        cliente.identificador = code;
-                        strcpy(cliente.cpf, cpf);
-                        strcpy(cliente.razaoSocial, "NA");
-                        strcpy(cliente.cnpj, "NA");
-
+                        cliente.identificador = codigo;
+                        strcpy(cliente.cnpj, cnpj);
+                        strcpy(cliente.cpf, "NA");
+                        strcpy(cliente.email, "NA");
+                        getch();
                         clear();
-                        printw("===== CADASTRO (Código: %d) =====\n\n",
-                               cliente.identificador);
-                        printw("Digite o seu nome: ");
+
+                        mvprintw(0, 0, "===== CADASTRO (Código: %d) =====\n\n",
+                                 cliente.identificador);
+                        mvprintw(5, 5, "Digite o seu nome: ");
                         echo();
                         getstr(cliente.nome);
                         if (strlen(cliente.nome) == 0) {
                             strcpy(cliente.nome, "NA");
                         }
 
-                        printw(
-                            "Digite o número de telefone (somente números): ");
-                        scanw("%d", &cliente.telefone);
-                        getch();
-
-                        printw("Digite o seu email: ");
-                        getstr(cliente.email);
-                        if (strlen(cliente.email) == 0) {
-                            strcpy(cliente.email, "NA");
-                        }
-
-                        printw("Digite o seu endereço na ordem:\n\n");
-                        printw("Rua: ");
-                        getstr(cliente.endereco.rua);
-                        if (strlen(cliente.endereco.rua) == 0) {
-                            strcpy(cliente.endereco.rua, "NA");
-                        }
-
-                        printw("Setor: ");
-                        getstr(cliente.endereco.setor);
-                        if (strlen(cliente.endereco.setor) == 0) {
-                            strcpy(cliente.endereco.setor, "NA");
-                        }
-
-                        printw("Cidade: ");
-                        getstr(cliente.endereco.cidade);
-                        if (strlen(cliente.endereco.cidade) == 0) {
-                            strcpy(cliente.endereco.cidade, "NA");
-                        }
-
-                        printw("Estado: ");
-                        getstr(cliente.endereco.estado);
-                        if (strlen(cliente.endereco.estado) == 0) {
-                            strcpy(cliente.endereco.estado, "NA");
-                        }
-                        noecho();
-
-                        fprintf(fp, "%d,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s\n",
-                                cliente.identificador, cliente.nome,
-                                cliente.telefone, cliente.email,
-                                cliente.endereco.rua, cliente.endereco.setor,
-                                cliente.endereco.cidade,
-                                cliente.endereco.estado, cliente.cpf,
-                                cliente.razaoSocial, cliente.cnpj);
-                        fflush(fp);
-
-                        printw("\nCliente cadastrado com sucesso!\n");
-                        validade = 1;
-                    } else {
-                        printw("\nCPF inválido! Digite novamente!\n");
-                        getch();
-                    }
-                    refresh();
-                    getch();
-                }
-            } while (validade != 1);
-            break;
-        }
-        case 2: {
-            Cliente cliente;
-            int validado_loop = 0;
-
-            do {
-                clear();
-                printw("===== Cadastro de Cliente (PJ) =====\n\n");
-
-                printw("Digite o código identificador do cliente: ");
-                scanw("%d", &cliente.identificador);
-                getch();
-                refresh();
-
-                int code_existe =
-                    codigoClienteJaExiste(fp, cliente.identificador);
-
-                if (code_existe) {
-                    clear();
-                    printw("ERRO: Código de cliente já cadastrado!");
-                    getch();
-                    refresh();
-                } else {
-                    int cnpjValidado = 0;
-                    char cnpj[tamCNPJ];
-
-                    clear();
-                    printw(
-                        "Código não cadastrado! Prosseguimos com o "
-                        "cadastro do "
-                        "CNPJ.\n\n");
-                    printw("Digite o CNPJ (somente 14 números): ");
-                    echo();
-                    getnstr(cnpj, 14);
-                    noecho();
-
-                    cnpjValidado = validaCNPJ(cnpj);
-
-                    if (cnpjValidado) {
-                        printw("\nCNPJ válido!\n");
-                        getch();
-                        refresh();
-
-                        strcpy(cliente.cnpj, cnpj);
-                        strcpy(cliente.cpf, "NA");
-
-                        clear();
-                        printw("===== CADASTRO (Código: %d) =====\n\n",
-                               cliente.identificador);
-                        printw("Digite a razão social: ");
-                        echo();
+                        mvprintw(5, 5, "Digite sua razão social: ");
                         getstr(cliente.razaoSocial);
                         if (strlen(cliente.razaoSocial) == 0) {
                             strcpy(cliente.razaoSocial, "NA");
                         }
 
-                        printw("Digite o nome para o contato: ");
-                        getstr(cliente.nome);
-                        if (strlen(cliente.nome) == 0) {
-                            strcpy(cliente.nome, "NA");
-                        }
-
-                        printw(
-                            "Digite o telefone para contato (somente "
-                            "números): ");
-                        scanw("%d", &cliente.telefone);
+                        mvprintw(
+                            7, 5,
+                            "Digite o número de telefone (somente números): ");
+                        scanw("%f", &cliente.telefone);
                         getch();
 
-                        printw("Digite o seu email: ");
+                        mvprintw(9, 5, "Digite o seu email: ");
                         getstr(cliente.email);
                         if (strlen(cliente.email) == 0) {
                             strcpy(cliente.email, "NA");
                         }
 
-                        printw("Digite o seu endereço na ordem:\n");
-                        printw("Rua: ");
+                        mvprintw(11, 5, "Digite o seu endereço na ordem:\n\n");
+                        mvprintw(12, 5, "Rua: ");
                         getstr(cliente.endereco.rua);
                         if (strlen(cliente.endereco.rua) == 0) {
                             strcpy(cliente.endereco.rua, "NA");
                         }
 
-                        printw("Setor: ");
+                        mvprintw(13, 5, "Setor: ");
                         getstr(cliente.endereco.setor);
                         if (strlen(cliente.endereco.setor) == 0) {
                             strcpy(cliente.endereco.setor, "NA");
                         }
 
-                        printw("Cidade: ");
+                        mvprintw(14, 5, "Cidade: ");
                         getstr(cliente.endereco.cidade);
                         if (strlen(cliente.endereco.cidade) == 0) {
                             strcpy(cliente.endereco.cidade, "NA");
                         }
 
-                        printw("Estado: ");
+                        mvprintw(15, 5, "Estado: ");
                         getstr(cliente.endereco.estado);
                         if (strlen(cliente.endereco.estado) == 0) {
                             strcpy(cliente.endereco.estado, "NA");
                         }
                         noecho();
 
-                        fprintf(fp, "%d,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s\n",
+                        fprintf(fp, "%d,%s,%f,%s,%s,%s,%s,%s,%s,%s,%s\n",
                                 cliente.identificador, cliente.nome,
                                 cliente.telefone, cliente.email,
                                 cliente.endereco.rua, cliente.endereco.setor,
@@ -455,29 +341,17 @@ void cadastrarClientes(FILE* fp) {
                                 cliente.razaoSocial, cliente.cnpj);
                         fflush(fp);
 
-                        printw("\nCliente cadastrado com sucesso!\n");
-                        validado_loop = 1;
+                        mvprintw(17, 5, "\nCliente cadastrado com sucesso!\n");
+                        validade = 1;
                     } else {
-                        printw("\nCNPJ inválido! Refaça novamente!\n");
+                        printw("\nCNPJ inválido! Digite novamente!\n");
                         getch();
                     }
-
-                    refresh();
-                    getch();
                 }
-            } while (validado_loop != 1);
-            break;
-        }
-        case 3:
-            break;
-        default:
-            printw("Opção inválida!\n");
-            refresh();
-            getch();
+
+            } while (validade01 != 1);
             break;
     }
-
-    */
 }
 
 void consultarClientes(FILE* fp) {
@@ -491,6 +365,8 @@ void consultarClientes(FILE* fp) {
     char cpf[tamCPF], razaoSocial[maxRazao], cnpj[tamCNPJ];
     int code;
     int contador = 0;
+
+    echo();
 
     rewind(fp);
 
@@ -508,9 +384,12 @@ void consultarClientes(FILE* fp) {
                   estado, cpf, razaoSocial, cnpj) == 11) {
         if (identificador == code) {
             contador++;
-            printw("%d,%s,%f,%s,%s,%s,%s,%s,%s,%s,%s\n", identificador, nome,
-                   telefone, email, rua, setor, cidade, estado, cpf,
-                   razaoSocial, cnpj);
+            printw(
+                "\nIdentificador: %d\nNome: %s\nTelefone: %f\nEmail: %s\nRua: "
+                "%s\nSetor: %s\nCidade: %s\nEstado: %s\nCPF: %s\nRazão Social: "
+                "%s\nCNPJ: %s\n",
+                identificador, nome, telefone, email, rua, setor, cidade,
+                estado, cpf, razaoSocial, cnpj);
         }
     }
 
@@ -677,7 +556,7 @@ int listarClientes(FILE* fp) {
             }
 
             mvprintw(y, x, "%d - %s", clientes[i].identificador,
-                         clientes[i].nome);
+                     clientes[i].nome);
 
             attroff(A_REVERSE);
         }

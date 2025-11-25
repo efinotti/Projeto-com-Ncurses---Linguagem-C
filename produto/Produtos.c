@@ -38,6 +38,7 @@ void cadastrarProdutos(FILE* fp) {
 		printw("===== CADASTRO DE PRODUTO =====\n\n");
 
 		printw("Digite um codigo identificador para o produto: ");
+        echo();
 		scanw("%d", &produto.identificador);
 		getch();
 
@@ -62,13 +63,14 @@ void cadastrarProdutos(FILE* fp) {
 	getnstr(produto.descricao, maxDescricao - 1);
 
 	printw("Digite o preco do produto: ");
+    echo();
 	scanw("%lf", &produto.preco);
 	getch();
 
 	printw("Digite quantos itens tem no estoque: ");
-	scanw("%d", &produto.estoque);
+	echo();
+    scanw("%d", &produto.estoque);
 	getch();
-	noecho();
 
 
 	fprintf(fp, "%d,%s,%.2lf,%d\n", produto.identificador, produto.descricao, produto.preco, produto.estoque);
@@ -92,7 +94,8 @@ void consultarProdutos(FILE* fp) {
 		printw("===== CONSULTAR PRODUTOS =====\n\n");
 
 		printw("Digite o codigo para ser consultado: ");
-		scanw("%d", &codigo);
+		echo();
+        scanw("%d", &codigo);
 
 		refresh();
 
@@ -145,6 +148,7 @@ void deletarProdutos(FILE* fp_origem) {
     clear();
     printw("\n\n===== DELETAR PRODUTO =====\n\n");
     printw("Digite o codigo do produto a ser deletado: ");
+    echo();
     scanw("%d", &codigo_alvo);
     getch();
     
