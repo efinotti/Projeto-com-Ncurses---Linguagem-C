@@ -226,25 +226,26 @@ void deletarProdutos(FILE* fp_origem) {
 void listarProdutos(FILE *fp) {
 	clear();
 	rewind(fp);
+    int ehVazio = 1;
 
 	Produtos produto;
     char buffer[MAX_LINE];
 
+    
 	printw("\n\n=====LISTA DE PRODUTOS=====\n\n");
 
-    if (fgets(buffer, MAX_LINE, fp) == NULL) {
-        printw("O arquivo esta vazio ou o cabeçalho não pôde ser lido.\n");
-        refresh();
-        getch();
-        return;
-    }
 
 	while (fscanf(fp, "%d,%99[^,],%lf,%d", &produto.identificador, produto.descricao, &produto.preco, &produto.estoque) == 4) {
-
+        getchar();
 		if(produto.identificador != 0) {
+            ehVazio = 1;
 			printw("Codigo do Produto: %d | Descricao: %s | Valor: %.2f | Estoque: %d\n", produto.identificador, produto.descricao, produto.preco, produto.estoque);
 		}
 	}
+
+    if (!ehVazio) {
+        mvprintw(5,5, "Não existe produto algum!");
+    }
 
 	refresh();
 	getch();
