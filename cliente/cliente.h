@@ -10,6 +10,7 @@
 #define maxData 11
 #define tamCPF 12
 #define tamCNPJ 15
+#define tamTelefone 10
 
 #include <ncurses.h>
 #include <stdio.h>
@@ -26,7 +27,7 @@ typedef struct {
 typedef struct {
     int identificador;
     char nome[maxNome];
-    float telefone;
+    char telefone[tamTelefone];
     char email[maxEmail];
     Endereco endereco;
     char cpf[tamCPF];
