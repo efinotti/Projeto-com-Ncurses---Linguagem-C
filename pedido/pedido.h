@@ -67,7 +67,7 @@ void cadastrarPedido(FILE *fpPe, FILE *fpC, FILE *fpP);
 void listarPedidos(FILE *fpPe);
 int consultarPedido(FILE *fpPe, FILE *fpC);
 FILE* deletarPedido(FILE *fpPe, FILE *fpC);
-int atualizarPedido(FILE *fpPe,  FILE *fpC, FILE *fpP);
+FILE* atualizarPedido(FILE *fpPe,  FILE *fpC, FILE *fpP);
 void obterDataAtual(char *destino, int tamanho);
 void obterDadosProduto(FILE *fpP,int codigoProduto, char *descricaoDestino, double *precoDestino);
 

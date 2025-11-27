@@ -12,25 +12,26 @@ void obterDataAtual(char *destino, int tamanho){
 
 void obterDadosProduto(FILE *fpP, int codigoProduto, char *descricaoDestino, double *precoDestino){
     rewind(fpP);
-    Produtos produto;
-    char linhaproduto[maxLinhas];
     
-    fgets(linhaproduto, maxLinhas, fpP);
-    
-    while(fscanf(fpP, "%d,%99[^,],%lf,%d", &produto.identificador, produto.descricao, &produto.preco, &produto.estoque) == 4){ 
-        if(produto.identificador == codigoProduto){
-            strncpy(descricaoDestino, produto.descricao, maxDescricao - 1);
-            descricaoDestino[maxDescricao - 1] = '\0';
-            *precoDestino = produto.preco;
-            rewind(fpP);
-            return;
+    char linha[1024];
+    int idTemp, estoqueTemp;
+    char descTemp[maxDescricao];
+    double precoTemp;
+
+    while(fgets(linha, sizeof(linha), fpP) != NULL){
+        if(sscanf(linha, "%d ; %[^;] ; %lf ; %d", 
+                  &idTemp, descTemp, &precoTemp, &estoqueTemp) == 4){
+            
+            if(idTemp == codigoProduto){
+                strncpy(descricaoDestino, descTemp, maxDescricao - 1);
+                descricaoDestino[maxDescricao - 1] = '\0';
+                *precoDestino = precoTemp;
+                return;
+            }
         }
     }
-
-    rewind(fpP);
-
     *precoDestino = 0.0;
-    strncpy(descricaoDestino, "Produto não Encontrado", maxDescricao);
+    strcpy(descricaoDestino, "Produto não Encontrado");
 }
 
 int codigoPedidoJaExiste(FILE* fpPe, int code){
@@ -45,8 +46,8 @@ int codigoPedidoJaExiste(FILE* fpPe, int code){
     double valorTotal;
     char status[maxStatus];
 
-   while(fscanf(fpPe, "%d,%d,%d,%d,%[^,],%[^,],%lf,%[^\n]%*c",&codigoPedido, &codigoCliente, &codigoProduto, &quantidade, data,
-        descricao, &valorTotal, status) == 8){
+   while(fscanf(fpPe, "%d ; %d ; %d ; %d ; %[^;] ; %[^;] ; %lf ; %[^\n]%*c", &codigoPedido, &codigoCliente, &codigoProduto,
+                &quantidade, data,descricao, &valorTotal, status) == 8){
         if(codigoPedido == code && codigoPedido != 0){ 
             return 1;
         }
@@ -68,11 +69,11 @@ void cadastrarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
     echo();
     scanw("%d", &pedido.codigoPedido);
     noecho();
-    getch();
 
     if(pedido.codigoPedido == 0){ 
         noecho();
         mvprintw(LINES - 22, 0, "Erro: O código do pedido não pode ser 0!\n");
+        flushinp();
         getch();
         return;
     }
@@ -80,6 +81,7 @@ void cadastrarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
     if(codigoPedidoJaExiste(fpPe, pedido.codigoPedido)){
         noecho();
         mvprintw(LINES - 22, 0, "Erro: Já existe este código de pedido!\n");
+        flushinp();
         getch();
         return;
     }
@@ -89,11 +91,11 @@ void cadastrarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
     echo();
     scanw("%d", &pedido.codigoCliente);
     noecho();
-    getch();
     
     if(!codigoClienteJaExiste(fpC, pedido.codigoCliente)){
         noecho();
         mvprintw(LINES - 22, 0, "Erro: Cliente não encontrado!\n");
+        flushinp();
         getch();
         return;
     }
@@ -103,11 +105,11 @@ void cadastrarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
     echo();
     scanw("%d", &pedido.codigoProduto);
     noecho();
-    getch();
     
     if(!codigoProdutoJaExiste(fpP, pedido.codigoProduto)){
         noecho();
         mvprintw(LINES - 22, 0, "Erro: Produto não encontrado!\n");
+        flushinp();
         getch();
         return;
     }
@@ -117,7 +119,6 @@ void cadastrarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
     echo();
     scanw("%d", &pedido.quantidade);
     noecho();
-    getch();
 
     obterDadosProduto(fpP, pedido.codigoProduto, pedido.descricao, &precoUnitario);
     pedido.valorTotal = precoUnitario * pedido.quantidade;
@@ -130,13 +131,14 @@ void cadastrarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
     mvprintw(12, 0, "Valor Unitário: R$ %.2f", precoUnitario);
     mvprintw(13, 0, "Valor Total: R$ %.2f", pedido.valorTotal);
     
-    fprintf(fpPe, "%d,%d,%d,%d,%s,%s,%.2f,%s\n", pedido.codigoPedido, pedido.codigoCliente,pedido.codigoProduto, pedido.quantidade, 
+    fprintf(fpPe, "%d ; %d ; %d ; %d ; %s ; %s ; %.2f ; %s\n", pedido.codigoPedido, pedido.codigoCliente,pedido.codigoProduto, pedido.quantidade, 
         pedido.data, pedido.descricao, pedido.valorTotal, pedido.status);
 
     fflush(fpPe);
 
     mvprintw(LINES - 2, 0, "\nPedido cadastrado com sucesso!\n");
     refresh();
+    flushinp();
     getch(); 
 }
 
@@ -148,16 +150,17 @@ void listarPedidos(FILE *fpPe){
     
     printw("\n\n=====LISTA DE PEDIDOS=====\n\n");
     
-    while(fscanf(fpPe, "%d,%d,%d,%d,%[^,],%[^,],%lf,%[^\n]%*c",&pedido.codigoPedido,&pedido.codigoCliente,&pedido.codigoProduto,
-        &pedido.quantidade,pedido.data,pedido.descricao,&pedido.valorTotal,pedido.status) == 8){       
+    while(fscanf(fpPe, "%d ; %d ; %d ; %d ; %[^;] ; %[^;] ; %lf ; %[^\n]%*c", &pedido.codigoPedido, &pedido.codigoCliente,
+        &pedido.codigoProduto,&pedido.quantidade, pedido.data, pedido.descricao, &pedido.valorTotal, pedido.status) == 8){       
         if(pedido.codigoPedido != 0){
             printw("Código do Pedido: %d | Cliente: %d | Produto: %d | Descrição: %s | Quantidade: %d | Valor: %.2f | Data: %s | Status: %s\n",
-                    pedido.codigoPedido,pedido.codigoCliente,pedido.codigoProduto,pedido.descricao,pedido.quantidade,pedido.valorTotal,
-                    pedido.data,pedido.status);
+                    pedido.codigoPedido, pedido.codigoCliente, pedido.codigoProduto, pedido.descricao, pedido.quantidade, 
+                    pedido.valorTotal, pedido.data, pedido.status);
         }
     }
             
     refresh();
+    flushinp();
     getch();
 }
 
@@ -173,10 +176,10 @@ int consultarPedido(FILE *fpPe, FILE *fpC){
     echo();
     scanw("%d", &codigoCliente);
     noecho(); 
-    getch();
     
     if(!codigoClienteJaExiste(fpC, codigoCliente)){
         printw("\nErro: Cliente não encontrado!\n");
+        flushinp();
         getch();
         return 0;
     }
@@ -186,8 +189,8 @@ int consultarPedido(FILE *fpPe, FILE *fpC){
     PedidoMenu *pedidosDoCliente = NULL;
     int totalPedidosCliente = 0;
     
-    while(fscanf(fpPe, "%d,%d,%d,%d,%[^,],%[^,],%lf,%[^\n]%*c",&pedido.codigoPedido, &pedido.codigoCliente, &pedido.codigoProduto,
-        &pedido.quantidade,pedido.data, pedido.descricao, &pedido.valorTotal, pedido.status) == 8){
+    while(fscanf(fpPe, "%d ; %d ; %d ; %d ; %[^;] ; %[^;] ; %lf ; %[^\n]%*c", &pedido.codigoPedido, &pedido.codigoCliente,
+        &pedido.codigoProduto,&pedido.quantidade, pedido.data, pedido.descricao, &pedido.valorTotal, pedido.status) == 8){
         if(pedido.codigoCliente == codigoCliente && pedido.codigoPedido != 0){
             totalPedidosCliente++;
         }
@@ -195,6 +198,7 @@ int consultarPedido(FILE *fpPe, FILE *fpC){
 
     if(totalPedidosCliente == 0){
         printw("\nErro: Nenhum Pedido Encontrado para este cliente!\n");
+        flushinp();
         getch();
         return 0;
     }
@@ -204,13 +208,14 @@ int consultarPedido(FILE *fpPe, FILE *fpC){
     if (pedidosDoCliente == NULL) {
         mvprintw(5, 5, "Erro fatal: Falha ao alocar memória!");
         refresh();
+        flushinp();
         getch();
         return -1;
     }
 
     rewind(fpPe);
     int i = 0;
-    while(fscanf(fpPe, "%d,%d,%d,%d,%[^,],%[^,],%lf,%[^\n]%*c",&pedido.codigoPedido, &pedido.codigoCliente, &pedido.codigoProduto,
+    while(fscanf(fpPe, "%d ; %d ; %d ; %d ; %[^;] ; %[^;] ; %lf ; %[^\n]%*c",&pedido.codigoPedido, &pedido.codigoCliente, &pedido.codigoProduto,
         &pedido.quantidade,pedido.data, pedido.descricao, &pedido.valorTotal, pedido.status) == 8){
         if(pedido.codigoCliente == codigoCliente && pedido.codigoPedido != 0){
             pedidosDoCliente[i].codigoPedido = pedido.codigoPedido;
@@ -266,7 +271,7 @@ int consultarPedido(FILE *fpPe, FILE *fpC){
     
     rewind(fpPe);
     
-    while(fscanf(fpPe, "%d,%d,%d,%d,%10[^,],%99[^,],%lf,%19[^\n]%*c",&pedido.codigoPedido, &pedido.codigoCliente, &pedido.codigoProduto,
+    while(fscanf(fpPe, "%d ; %d ; %d ; %d ; %10[^;] ; %99[^;] ; %lf ; %19[^\n]%*c",&pedido.codigoPedido, &pedido.codigoCliente, &pedido.codigoProduto,
         &pedido.quantidade,pedido.data, pedido.descricao, &pedido.valorTotal, pedido.status) == 8){
         if(pedido.codigoPedido == codigoPedidoSelecionado){
             printw("\n=====DETALHES DO PEDIDO %d=====\n", pedido.codigoPedido);
@@ -279,11 +284,12 @@ int consultarPedido(FILE *fpPe, FILE *fpC){
 
     printw("\n\nPressione qualquer tecla para continuar...");
     refresh();
+    flushinp();
     getch();
     return 1;
 }
 
-int atualizarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
+FILE* atualizarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
     int codigoCliente, mod, totalPedidosCliente = 0, opc = -1, escolhaModificacao = -1;
     Pedido pedido, pedidoModificado;
     PedidoMenu *pedidosDoCliente = NULL; 
@@ -297,17 +303,15 @@ int atualizarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
     scanw("%d", &codigoCliente);
     noecho();
     
-    getch();
-    
     if(!codigoClienteJaExiste(fpC, codigoCliente)){
         printw("\nErro: Cliente não encontrado!\n");
         getch();
-        return 0; 
+        return fpPe; 
     }
 
     rewind(fpPe);
 
-    while(fscanf(fpPe, "%d,%d,%d,%d,%[^,],%[^,],%lf,%[^\n]%*c",&pedido.codigoPedido, &pedido.codigoCliente, &pedido.codigoProduto,
+    while(fscanf(fpPe, "%d ; %d ; %d ; %d ; %[^;] ; %[^;] ; %lf ; %[^\n]%*c",&pedido.codigoPedido, &pedido.codigoCliente, &pedido.codigoProduto,
         &pedido.quantidade, pedido.data, pedido.descricao, &pedido.valorTotal, pedido.status) == 8){
         if(pedido.codigoCliente == codigoCliente && pedido.codigoPedido != 0){
             totalPedidosCliente++;
@@ -316,8 +320,9 @@ int atualizarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
 
     if(totalPedidosCliente == 0){
         printw("\nErro: Nenhum Pedido Encontrado para este cliente!\n");
+        flushinp();
         getch();
-        return 0;
+        return fpPe;
     }
     
     pedidosDoCliente = (PedidoMenu*)malloc(totalPedidosCliente * sizeof(PedidoMenu));
@@ -325,13 +330,13 @@ int atualizarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
     if (pedidosDoCliente == NULL) {
         mvprintw(5, 5, "Erro fatal: Falha ao alocar memória!");
         getch();
-        return -1;
+        return fpPe;
     }
 
     rewind(fpPe);
     int i = 0;
     
-    while(fscanf(fpPe, "%d,%d,%d,%d,%[^,],%[^,],%lf,%[^\n]%*c",&pedido.codigoPedido, &pedido.codigoCliente, &pedido.codigoProduto,
+    while(fscanf(fpPe, "%d ; %d ; %d ; %d ; %[^;] ; %[^;] ; %lf ; %[^\n]%*c",&pedido.codigoPedido, &pedido.codigoCliente, &pedido.codigoProduto,
         &pedido.quantidade,pedido.data, pedido.descricao, &pedido.valorTotal, pedido.status) == 8){
         if(pedido.codigoCliente == codigoCliente && pedido.codigoPedido != 0){
             pedidosDoCliente[i].codigoPedido = pedido.codigoPedido;
@@ -384,7 +389,7 @@ int atualizarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
     rewind(fpPe);
     int pedidoEncontrado = 0;
 
-    while(fscanf(fpPe, "%d,%d,%d,%d,%[^,],%[^,],%lf,%[^\n]%*c",&pedido.codigoPedido,&pedido.codigoCliente,&pedido.codigoProduto,
+    while(fscanf(fpPe, "%d ; %d ; %d ; %d ; %[^;] ; %[^;] ; %lf ; %[^\n]%*c",&pedido.codigoPedido,&pedido.codigoCliente,&pedido.codigoProduto,
         &pedido.quantidade,pedido.data,pedido.descricao,&pedido.valorTotal,pedido.status) == 8){
         if (pedido.codigoPedido == opc && pedido.codigoCliente == codigoCliente) {
             pedidoModificado = pedido;
@@ -395,9 +400,10 @@ int atualizarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
     
     if(!pedidoEncontrado){
         printw("\nErro: Pedido não encontrado ou não pertence ao cliente (Código: %d)!\n", opc);
+        flushinp();
         getch();
         if (pedidosDoCliente != NULL) free(pedidosDoCliente);
-        return 0; 
+        return fpPe; 
     }
     
     char *opcoesModificacao[] = {
@@ -480,29 +486,28 @@ int atualizarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
     obterDataAtual(pedidoModificado.data, maxData);
     }
 
-    getch(); 
-
     FILE *fpTemp = fopen("pedidos_temp.csv", "w");
     if (fpTemp == NULL) {
         printw("\nErro: Nao foi possivel criar arquivo temporario para atualizacao.\n");
+        flushinp();
         getch();
         if (pedidosDoCliente != NULL) free(pedidosDoCliente);
-        return 0; 
+        return fpPe; 
     }
     
     rewind(fpPe); 
     
-    while(fscanf(fpPe, "%d,%d,%d,%d,%[^,],%[^,],%lf,%[^\n]%*c",
+    while(fscanf(fpPe, "%d ; %d ; %d ; %d ; %[^;] ; %[^;] ; %lf ; %[^\n]%*c",
                  &pedido.codigoPedido,&pedido.codigoCliente,&pedido.codigoProduto,&pedido.quantidade,
                  pedido.data,pedido.descricao,&pedido.valorTotal,pedido.status) == 8){
         if (pedido.codigoPedido == opc) {
-            fprintf(fpTemp, "%d,%d,%d,%d,%s,%s,%.2f,%s\n", 
+            fprintf(fpTemp, "%d ; %d ; %d ; %d ; %s ; %s ; %.2f ; %s\n", 
                      pedidoModificado.codigoPedido, pedidoModificado.codigoCliente, 
                      pedidoModificado.codigoProduto, pedidoModificado.quantidade, 
                      pedidoModificado.data, pedidoModificado.descricao, 
                      pedidoModificado.valorTotal, pedidoModificado.status);
         } else {
-            fprintf(fpTemp, "%d,%d,%d,%d,%s,%s,%.2f,%s\n", 
+            fprintf(fpTemp, "%d ; %d ; %d ; %d ; %s ; %s ; %.2f ; %s\n", 
                      pedido.codigoPedido, pedido.codigoCliente, 
                      pedido.codigoProduto, pedido.quantidade, 
                      pedido.data, pedido.descricao, pedido.valorTotal, pedido.status);
@@ -527,7 +532,7 @@ int atualizarPedido(FILE *fpPe, FILE *fpC, FILE *fpP){
         getch();
     }
     if (pedidosDoCliente != NULL) free(pedidosDoCliente);
-    return resultado;
+    return fpPe;
 }
 
 FILE* deletarPedido(FILE *fpPe, FILE *fpC){
@@ -539,11 +544,10 @@ FILE* deletarPedido(FILE *fpPe, FILE *fpC){
     clear();
     mvprintw(0, 0, "===== EXCLUIR PEDIDO =====");
     mvprintw(3, 5, "Informe o código do Cliente dono do pedido:");
-    fflush(stdout);
+    refresh();
     echo();
     scanw("%d", &codigoCliente);
     noecho();
-    getch();
     
     if(!codigoClienteJaExiste(fpC,codigoCliente)){
         printw("\nErro: Cliente não encontrado!\n");
@@ -556,7 +560,7 @@ FILE* deletarPedido(FILE *fpPe, FILE *fpC){
     
     rewind(fpPe);
 
-    while(fscanf(fpPe, "%d,%d,%d,%d,%[^,],%[^,],%lf,%[^\n]%*c",
+    while(fscanf(fpPe, "%d ; %d ; %d ; %d ; %[^;] ; %[^;] ; %lf ; %[^\n]%*c",
                  &pedido.codigoPedido,&pedido.codigoCliente,&pedido.codigoProduto,&pedido.quantidade,
                  pedido.data,pedido.descricao,&pedido.valorTotal,pedido.status) == 8){
         if(pedido.codigoCliente == codigoCliente && pedido.codigoPedido != 0){
@@ -567,20 +571,21 @@ FILE* deletarPedido(FILE *fpPe, FILE *fpC){
     }
     if(encontro == 0){
         printw("\nErro: Nenhum Pedido Encontrado!\n");
+        flushinp();
         getch();
         return fpPe;
     }
     
     printw("\nInforme o código do pedido que você deseja desfazer:\n");
-    fflush(stdout);
+    refresh();
     echo();
     scanw("%d", &opc);
     noecho();
-    getch();
 
     FILE *fpTemp = fopen("pedidos_temp.csv", "w"); 
     if (fpTemp == NULL) {
         printw("\nErro: Nao foi possivel criar arquivo temporario.\n");
+        flushinp();
         getch();
         return fpPe;
     }
@@ -588,11 +593,11 @@ FILE* deletarPedido(FILE *fpPe, FILE *fpC){
     rewind(fpPe);
     int pedidoDeletado = 0;
     
-    while(fscanf(fpPe, "%d,%d,%d,%d,%[^,],%[^,],%lf,%[^\n]%*c",
+    while(fscanf(fpPe, "%d ; %d ; %d ; %d ; %[^;] ; %[^;] ; %lf ; %[^\n]%*c",
                  &pedido.codigoPedido,&pedido.codigoCliente,&pedido.codigoProduto,&pedido.quantidade,
                  pedido.data,pedido.descricao,&pedido.valorTotal,pedido.status) == 8){
         if (pedido.codigoPedido != opc) {
-            fprintf(fpTemp, "%d,%d,%d,%d,%s,%s,%.2f,%s\n", 
+            fprintf(fpTemp, "%d ; %d ; %d ; %d ; %s ; %s ; %.2f ; %s\n", 
                     pedido.codigoPedido, pedido.codigoCliente, 
                     pedido.codigoProduto, pedido.quantidade, 
                     pedido.data, pedido.descricao, pedido.valorTotal, pedido.status);
@@ -610,6 +615,8 @@ FILE* deletarPedido(FILE *fpPe, FILE *fpC){
     fpPe = fopen(ARQUIVO_PEDIDOS, "a+");
     if (fpPe == NULL) {
          printw("\nERRO CRÍTICO: Nao foi possivel reabrir o arquivo de pedidos.\n");
+         refresh();
+         getch();
          exit(1); 
     }
     if (pedidoDeletado) {
@@ -618,7 +625,8 @@ FILE* deletarPedido(FILE *fpPe, FILE *fpC){
          printw("\nErro: Pedido %d nao encontrado!\n", opc);
     }
 
-    fflush(fpPe);
+    refresh();
+    flushinp();
     getch();
     return fpPe;
 }

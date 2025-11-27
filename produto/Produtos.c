@@ -1,31 +1,20 @@
 #include "Produtos.h"
 
 int codigoProdutoJaExiste(FILE* fp, int code) {
-	int codigo, estoque;
-	char descricao[maxDescricao];
-	double preco;
+    rewind(fp);
 
-	int valido = 0;
+    char linha[1024];
+    int identificador;
 
-	rewind(fp);
 
-    char buffer[MAX_LINE];
-
-    if (fgets(buffer, MAX_LINE, fp) == NULL) {
-        printw("O arquivo esta vazio ou o cabeçalho não pôde ser lido.\n");
-        refresh();
-        getch();
-        return 0;
+    while (fgets(linha, sizeof(linha), fp) != NULL) {
+        if (sscanf(linha, "%d", &identificador) == 1) {
+            if(identificador == code) {
+                return 1;
+            }
+        }
     }
-
-	while (fscanf(fp, "%d,%99[^,],%lf,%d", &codigo, descricao, &preco, &estoque) == 4 ) {
-		if(codigo != 0) {
-			if(codigo == code) {
-				return 1;
-			}
-		}
-	}
-	return 0;
+    return 0;
 }
 
 void cadastrarProdutos(FILE* fp) {
@@ -73,7 +62,7 @@ void cadastrarProdutos(FILE* fp) {
 	getch();
 
 
-	fprintf(fp, "%d,%s,%.2lf,%d\n", produto.identificador, produto.descricao, produto.preco, produto.estoque);
+	fprintf(fp, "%d ; %s ; %.2lf ; %d\n", produto.identificador, produto.descricao, produto.preco, produto.estoque);
 	fflush(fp);
 
 	printw("\nProduto cadastrado com sucesso!");
@@ -114,7 +103,7 @@ void consultarProdutos(FILE* fp) {
         return;
     }
 
-		while (fscanf(fp, "%d,%99[^,],%lf,%d", &produto.identificador, produto.descricao, &produto.preco, &produto.estoque) == 4) {
+		while (fscanf(fp, "%d ; %99[^;] ; %lf ; %d", &produto.identificador, produto.descricao, &produto.preco, &produto.estoque) == 4) {
 			if (codigo == produto.identificador) {
 				printw("%d,%s,%lf,%d", produto.identificador, produto.descricao,
 				       produto.preco, produto.estoque);
@@ -164,7 +153,7 @@ void deletarProdutos(FILE* fp_origem) {
         fprintf(fp_temp, "%s", buffer);
     }
     
-    while (fscanf(fp_origem, "%d%*c%99[^,],%lf,%d", 
+    while (fscanf(fp_origem, "%d%*c%99[^;] ; %lf ; %d", 
                   &produto.identificador, produto.descricao, &produto.preco, &produto.estoque) == 4) 
     {
         
@@ -189,13 +178,13 @@ void deletarProdutos(FILE* fp_origem) {
                 printw("\nExclusão confirmada. Linha sera pulada na reescrita.");
             } else {
                 printw("\nExclusão negada. Produto sera mantido.");
-                fprintf(fp_temp, "%d,%s,%.2lf,%d\n", 
+                fprintf(fp_temp, "%d ; %s ; %.2lf ; %d\n", 
                         produto.identificador, produto.descricao, produto.preco, produto.estoque);
             }
             refresh(); getch(); 
             
         } else {
-            fprintf(fp_temp, "%d,%s,%.2lf,%d\n", 
+            fprintf(fp_temp, "%d ; %s ; %.2lf ; %d\n", 
                     produto.identificador, produto.descricao, produto.preco, produto.estoque);
         }
     }
@@ -224,29 +213,33 @@ void deletarProdutos(FILE* fp_origem) {
 }
 
 void listarProdutos(FILE *fp) {
-	clear();
-	rewind(fp);
-    int ehVazio = 1;
-
-	Produtos produto;
-    char buffer[MAX_LINE];
-
+    clear();
+    rewind(fp);
     
-	printw("\n\n=====LISTA DE PRODUTOS=====\n\n");
+    int ehVazio = 1; 
+    char linha[1024];
+    
+    Produtos produto;
 
+    printw("\n\n===== LISTA DE PRODUTOS =====\n\n");
 
-	while (fscanf(fp, "%d,%99[^,],%lf,%d", &produto.identificador, produto.descricao, &produto.preco, &produto.estoque) == 4) {
-        getchar();
-		if(produto.identificador != 0) {
-            ehVazio = 1;
-			printw("Codigo do Produto: %d | Descricao: %s | Valor: %.2f | Estoque: %d\n", produto.identificador, produto.descricao, produto.preco, produto.estoque);
-		}
-	}
-
-    if (!ehVazio) {
-        mvprintw(5,5, "Não existe produto algum!");
+    while (fgets(linha, sizeof(linha), fp) != NULL) {
+        if(sscanf(linha, "%d ; %[^;] ; %lf ; %d", 
+           &produto.identificador, produto.descricao, &produto.preco, &produto.estoque) == 4) {
+            
+            if(produto.identificador != 0) {
+                ehVazio = 0;
+                printw("ID: %d | %s | R$ %.2f | Qtd: %d\n", 
+                       produto.identificador, produto.descricao, produto.preco, produto.estoque);
+            }
+        }
     }
 
-	refresh();
-	getch();
+    if (ehVazio) {
+        printw("Nenhum produto cadastrado!\n");
+    }
+
+    printw("\nPressione qualquer tecla para voltar...");
+    refresh();
+    getch();
 }

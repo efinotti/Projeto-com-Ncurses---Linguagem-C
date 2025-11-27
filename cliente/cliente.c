@@ -63,21 +63,14 @@ int validaCNPJ(char cnpj[tamCNPJ]) {
 int codigoClienteJaExiste(FILE* fp, int code) {
     rewind(fp);
 
+    char linha[1024];
     int identificador;
-    char nome[maxNome];
-    char telefone[20];
-    char email[maxEmail];
-    char rua[maxEndereco], setor[maxEndereco], cidade[maxEndereco],
-        estado[maxEndereco];
-    char cpf[tamCPF], razaoSocial[maxRazao], cnpj[tamCNPJ];
 
-    while (fscanf(fp,
-                  "%d;%29[^;];%19[^;];%49[^;];%39[^;];%39[^;];%39[^;];%39[^;];%11[^;"
-                  "];%39[^;];%14[^\n]\n",
-                  &identificador, nome, telefone, email, rua, setor, cidade,
-                  estado, cpf, razaoSocial, cnpj) == 11) {
-        if (identificador == code) {
-            return 1;
+    while (fgets(linha, sizeof(linha), fp) != NULL) {
+        if (sscanf(linha, "%d;", &identificador) == 1) {
+            if (identificador == code) {
+                return 1;
+            }
         }
     }
     return 0;
@@ -545,24 +538,24 @@ int listarClientes(FILE* fp) {
     char nome[maxNome];
     char telefone[20];
     char email[maxEmail];
-    char rua[maxEndereco], setor[maxEndereco], cidade[maxEndereco],
-        estado[maxEndereco];
+    char rua[maxEndereco], setor[maxEndereco], cidade[maxEndereco], estado[maxEndereco];
     char cpf[tamCPF], razaoSocial[maxRazao], cnpj[tamCNPJ];
 
+    char linha[1024]; 
     int contador = 0;
 
     rewind(fp);
 
-    while (fscanf(fp,
-                  "%d;%29[^;];%19[^;];%49[^;];%39[^;];%39[^;];%39[^;];%39[^;];%11[^;"
-                  "];%39[^;];%14[^\n]\n",
-                  &identificador, nome, telefone, email, rua, setor, cidade,
-                  estado, cpf, razaoSocial, cnpj) == 11) {
-        contador++;
+    while (fgets(linha, sizeof(linha), fp) != NULL) {
+        if (sscanf(linha, "%d;%[^;];%[^;];%[^;];%[^;];%[^;];%[^;];%[^;];%[^;];%[^;];%[^\n]",
+            &identificador, nome, telefone, email, rua, setor, cidade,
+            estado, cpf, razaoSocial, cnpj) == 11) {
+            contador++;
+        }
     }
 
     if (contador == 0) {
-        mvprintw(5, 5, "Nenhum cliente cadastrado.");
+        mvprintw(5, 5, "Nenhum cliente cadastrado (ou erro de leitura no arquivo).");
         refresh();
         getch();
         return -1;
@@ -578,16 +571,16 @@ int listarClientes(FILE* fp) {
 
     rewind(fp);
     int i = 0;
-    while (fscanf(fp,
-                  "%d;%29[^;];%19[^;];%49[^;];%39[^;];%39[^;];%39[^;];%39[^;];%11[^;"
-                  "];%39[^;];%14[^\n]\n",
-                  &clientes[i].identificador, clientes[i].nome,
-                  clientes[i].telefone, clientes[i].email,
-                  clientes[i].endereco.rua, clientes[i].endereco.setor,
-                  clientes[i].endereco.cidade, clientes[i].endereco.estado,
-                  clientes[i].cpf, clientes[i].razaoSocial,
-                  clientes[i].cnpj) == 11) {
-        i++;
+    while (fgets(linha, sizeof(linha), fp) != NULL) {
+        if (sscanf(linha, "%d;%[^;];%[^;];%[^;];%[^;];%[^;];%[^;];%[^;];%[^;];%[^;];%[^\n]",
+            &clientes[i].identificador, clientes[i].nome,
+            clientes[i].telefone, clientes[i].email,
+            clientes[i].endereco.rua, clientes[i].endereco.setor,
+            clientes[i].endereco.cidade, clientes[i].endereco.estado,
+            clientes[i].cpf, clientes[i].razaoSocial,
+            clientes[i].cnpj) == 11) {
+            i++;
+        }
     }
 
     int tecla;
@@ -596,61 +589,49 @@ int listarClientes(FILE* fp) {
 
     while (escolha == -1) {
         clear();
-        mvprintw(0, 0, "===== SELECIONE UM CLIENTE =====");
-        mvprintw(2, 5,
-                 "Use as setas para navegar. ENTER para selecionar. 'q' para "
-                 "cancelar.");
+        mvprintw(0, 0, "===== SELECIONE UM CLIENTE (%d encontrados) =====", contador);
+        mvprintw(2, 5, "Use as setas para navegar. ENTER para selecionar. 'q' para cancelar.");
 
-        for (i = 0; i < contador; i++) {
+        for (int k = 0; k < contador; k++) {
             int x = 5;
-            int y = 5 + i;
+            int y = 5 + k;
 
-            if (destaque == i) {
+            if (destaque == k) {
                 attron(A_REVERSE);
-                mvprintw(5, 60, "Email: %s", clientes[i].email);
-                mvprintw(7, 60, "Telefone: %s", clientes[i].telefone);
-                mvprintw(9, 60, "CPF: %s", clientes[i].cpf);
-                mvprintw(11, 60, "CNPJ: %s", clientes[i].cnpj);
-                mvprintw(13, 60, "Razão Social: %s", clientes[i].razaoSocial);
-                mvprintw(15, 60, "Cidade: %s", clientes[i].endereco.cidade);
-                mvprintw(17, 60, "Estado: %s", clientes[i].endereco.estado);
-                mvprintw(19, 60, "Setor: %s", clientes[i].endereco.setor);
-                mvprintw(21, 60, "Rua: %s", clientes[i].endereco.rua);
+                mvprintw(5, 40, "Detalhes do Cliente Selecionado:");
+                mvprintw(7, 40, "Email: %.30s", clientes[k].email);
+                mvprintw(8, 40, "Tel: %s", clientes[k].telefone);
+                mvprintw(9, 40, "CPF: %s | CNPJ: %s", clientes[k].cpf, clientes[k].cnpj);
+                mvprintw(10, 40, "Cidade: %s - %s", clientes[k].endereco.cidade, clientes[k].endereco.estado);
             }
 
-            mvprintw(y, x, "%d - %s", clientes[i].identificador,
-                     clientes[i].nome);
-
+            mvprintw(y, x, "%d - %s", clientes[k].identificador, clientes[k].nome);
             attroff(A_REVERSE);
         }
 
         refresh();
-
         tecla = getch();
 
         switch (tecla) {
             case KEY_UP:
                 destaque--;
-                if (destaque < 0) {
-                    destaque = contador - 1;
-                }
+                if (destaque < 0) destaque = contador - 1;
                 break;
             case KEY_DOWN:
                 destaque++;
-                if (destaque >= contador) {
-                    destaque = 0;
-                }
+                if (destaque >= contador) destaque = 0;
                 break;
-            case 10:
+            case 10: 
                 escolha = clientes[destaque].identificador;
                 break;
             case 'q':
             case 'Q':
                 escolha = -1;
-                break;
+                goto fim; 
         }
     }
 
+fim:
     free(clientes);
     clear();
     return escolha;
