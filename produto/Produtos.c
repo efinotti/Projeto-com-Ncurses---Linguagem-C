@@ -96,12 +96,6 @@ void consultarProdutos(FILE* fp) {
 
         char buffer[MAX_LINE];
 
-        if (fgets(buffer, MAX_LINE, fp) == NULL) {
-        printw("O arquivo esta vazio ou o cabeçalho não pôde ser lido.\n");
-        refresh();
-        getch();
-        return;
-    }
 
 		while (fscanf(fp, "%d ; %99[^;] ; %lf ; %d", &produto.identificador, produto.descricao, &produto.preco, &produto.estoque) == 4) {
 			if (codigo == produto.identificador) {
@@ -149,11 +143,7 @@ void deletarProdutos(FILE* fp_origem) {
         refresh(); getch(); return;
     }
     
-    if (fgets(buffer, MAX_LINE, fp_origem) != NULL) {
-        fprintf(fp_temp, "%s", buffer);
-    }
-    
-    while (fscanf(fp_origem, "%d%*c%99[^;] ; %lf ; %d", 
+    while (fscanf(fp_origem, "%d ; %99[^;] ; %lf ; %d", 
                   &produto.identificador, produto.descricao, &produto.preco, &produto.estoque) == 4) 
     {
         
